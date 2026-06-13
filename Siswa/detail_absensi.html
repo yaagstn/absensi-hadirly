@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Detail Kehadiran - HadirLy</title>
+
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+            rel="stylesheet" />
+
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+
+            body {
+                background: #f8fafc;
+                overflow-x: hidden;
+            }
+
+            /* SIDEBAR */
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                width: 260px;
+                background: #11101d;
+                z-index: 100;
+                transition: all 0.5s ease;
+            }
+
+            .sidebar.close {
+                left: -260px;
+            }
+
+            .sidebar .logo-details {
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                background: #f0f2f5;
+            }
+
+            .sidebar .logo-details img {
+                height: 35px;
+                margin-right: 12px;
+            }
+
+            .sidebar .logo-details .logo_name {
+                color: #134354;
+                font-size: 24px;
+                font-weight: 700;
+            }
+
+            .sidebar .nav-links {
+                padding: 20px 0;
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                height: calc(100% - 70px);
+            }
+
+            .sidebar .nav-links li a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                padding: 12px 20px;
+                transition: 0.4s;
+                color: #fff;
+            }
+
+            .sidebar .nav-links li a i {
+                min-width: 50px;
+                text-align: center;
+                font-size: 18px;
+                opacity: 0.7;
+            }
+
+            .sidebar .nav-links li a .link_name {
+                font-size: 15px;
+            }
+
+            .sidebar .nav-links li a:hover,
+            .sidebar .nav-links li a.active {
+                background: #1d1b31;
+            }
+
+            .sidebar .nav-links li a:hover i,
+            .sidebar .nav-links li a.active i {
+                opacity: 1;
+                color: #4481eb;
+            }
+
+            .sidebar .nav-links .log_out {
+                border-top: 1px solid #2c2e3e;
+                margin-top: auto;
+                margin-bottom: 20px;
+            }
+
+            /* MAIN CONTENT */
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: 0.5s;
+            }
+
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            /* NAVBAR */
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 70px;
+                background: #fff;
+                position: fixed;
+                width: calc(100% - 260px);
+                top: 0;
+                z-index: 99;
+                padding: 0 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: all 0.5s ease;
+            }
+
+            .navbar.w-100 {
+                width: 100%;
+                left: 0;
+            }
+
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .menu_icon {
+                display: none;
+            }
+
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .school-name {
+                font-weight: 600;
+                border-right: 2px solid #e0e0e0;
+                padding-right: 20px;
+            }
+
+            /* PROFILE */
+            .profile-dropdown {
+                position: relative;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            #navProfileImg {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+
+            .profile-text {
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+                line-height: 1.2;
+            }
+
+            .admin_name {
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .role {
+                font-size: 11px;
+                color: #707070;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #fff;
+                width: 180px;
+                padding: 10px 0;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                list-style: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1100;
+            }
+
+            .dropdown-menu.active {
+                opacity: 1;
+                visibility: visible;
+                top: 70px;
+            }
+
+            .dropdown-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 20px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+            .dropdown-menu li a:hover {
+                background: #f0f7ff;
+                color: #4481eb;
+            }
+
+            /* CONTAINER */
+            .container {
+                padding: 100px 30px 30px;
+            }
+
+            .welcome-box {
+                background: linear-gradient(135deg, #4481eb 0%, #04befe 100%);
+                padding: 25px;
+                border-radius: 15px;
+                margin-bottom: 30px;
+                color: white;
+                box-shadow: 0 10px 20px rgba(68, 129, 235, 0.2);
+            }
+
+            .attendance-card {
+                background: #fff;
+                border-radius: 16px;
+                padding: 25px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            table th {
+                background: #f1f5f9;
+                padding: 14px;
+                text-align: left;
+                font-size: 14px;
+            }
+
+            table td {
+                padding: 14px;
+                border-bottom: 1px solid #eee;
+                font-size: 14px;
+            }
+
+            .badge-status {
+                padding: 6px 14px;
+                border-radius: 30px;
+                font-size: 12px;
+                font-weight: 600;
+                color: white;
+            }
+
+            .hadir {
+                background: #22c55e;
+            }
+
+            .sakit {
+                background: #3b82f6;
+            }
+
+            .izin {
+                background: #f59e0b;
+            }
+
+            .alpha {
+                background: #ef4444;
+            }
+
+            /* RESPONSIVE */
+            @media (max-width: 768px) {
+                .sidebar {
+                    left: -260px;
+                }
+
+                .sidebar.show {
+                    left: 0;
+                }
+
+                .main-content {
+                    margin-left: 0;
+                    width: 100%;
+                }
+
+                .navbar {
+                    width: 100%;
+                    padding: 0 15px;
+                }
+
+                .menu_icon {
+                    display: block;
+                    font-size: 22px;
+                    cursor: pointer;
+                }
+
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+
+                .container {
+                    padding: 90px 15px 20px;
+                }
+
+                table th,
+                table td {
+                    font-size: 12px;
+                    padding: 10px;
+                }
+
+                .welcome-box h2 {
+                    font-size: 18px;
+                }
+            }
+        </style>
+
+    </head>
+    <body>
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a href="dashboard_siswa.html">
+                        <i class="fas fa-home"></i>
+                        <span class="link_name">Halaman Awal</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="jadwal.html" class="active">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="link_name">Jadwal Mapel</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="izin.html">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="link_name">Masukkan Izin</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="profil.html">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="link_name">Profil</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="laporan.html">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="link_name">Laporan</span>
+                    </a>
+                </li>
+
+                <li class="log_out">
+                    <a href="#" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link_name">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- MAIN -->
+        <div class="main-content" id="main_content">
+
+            <!-- NAVBAR -->
+            <nav class="navbar" id="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+
+                    <span class="dashboard-title">
+                        <b>Detail Kehadiran</b>
+                    </span>
+                </div>
+
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+
+                        <div class="profile-text">
+                            <span class="admin_name" id="nav-user-name">
+                                Memuat...
+                            </span>
+
+                            <span class="role" id="nav-user-role">
+                                Memuat...
+                            </span>
+                        </div>
+
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            id="navProfileImg" />
+
+                        <ul class="dropdown-menu" id="dropdownMenu">
+                            <li>
+                                <a href="profil.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+
+                            <hr style="border:0;border-top:1px solid #eee;" />
+
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- CONTENT -->
+            <div class="container">
+
+                <div class="welcome-box">
+                    <h2 id="judulMapel">Detail Kehadiran</h2>
+
+                    <p id="subMapel">
+                        Memuat data mapel...
+                    </p>
+                </div>
+
+                <div class="attendance-card">
+                        <!-- FILTER BULAN -->
+                        <div style="margin-bottom:20px; display:flex; gap:10px; align-items:center;">
+                            <label for="filterBulan">
+                                <b>Filter Bulan:</b>
+                            </label>
+                            <select id="filterBulan"
+                                style="
+                                    padding:10px;
+                                    border-radius:8px;
+                                    border:1px solid #ccc;
+                                ">
+                                <option value="all">Semua Bulan</option>
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Maret</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Juni</option>
+                                <option value="6">Juli</option>
+                                <option value="7">Agustus</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Desember</option>
+                            </select>
+                        </div>
+                        <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tbodyAbsensi">
+                                <tr>
+                                    <td colspan="3" style="text-align:center;">
+                                        Memuat data...
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+                    const btnMenu = document.querySelector('#btn_menu');
+                    const sidebar = document.querySelector('.sidebar');
+                    const mainContent = document.querySelector('.main-content');
+                    const navbar = document.querySelector('.navbar');
+
+                     // Sidebar
+                    btnMenu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (window.innerWidth <= 768) sidebar.classList.toggle('show');
+                    else { sidebar.classList.toggle('close'); mainContent.classList.toggle('m-0'); }
+                    });
+                    document.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 768 && sidebar.classList.contains('show') && !sidebar.contains(e.target) && e.target !== btnMenu)
+                    sidebar.classList.remove('show');
+                    });
+
+
+                    function syncProfile() {
+                        const user = JSON.parse(localStorage.getItem('currentUser'));
+                    if (!user || user.role !== 'siswa') {
+                        window.location.href = '../login.html';
+                    }
+                        const savedPhoto = localStorage.getItem('userPhoto');
+                        const navImg = document.getElementById('navProfileImg');
+
+                        if (savedPhoto && navImg) navImg.src = savedPhoto;
+
+                        const navName = document.getElementById('nav-user-name');
+                        const navRole = document.getElementById('nav-user-role');
+                        if (navName) navName.innerText = user.nama || 'Siswa';
+                        if (navRole) navRole.innerText = `Siswa - ${user.id_kelas || ''}`;
+                    }
+
+                      const profileDropdown = document.getElementById('profileDropdown');
+                        const dropdownMenu = document.getElementById('dropdownMenu');
+                        if (profileDropdown) {
+                            profileDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle('active'); };
+                        }
+                        window.onclick = (e) => { if (!e.target.closest('.profile-dropdown') && dropdownMenu) dropdownMenu.classList.remove('active'); };
+
+                        // Logout
+                    document.getElementById('logout-dropdown').addEventListener('click', (e) => {
+                    document.getElementById('logout-btn').click();
+                    });
+                    const logoutBtn = document.getElementById('logout-btn');
+                    if (logoutBtn) {
+
+                        logoutBtn.addEventListener('click', (e) => {
+
+                            e.preventDefault();
+
+                            Swal.fire({
+                                title: 'Konfirmasi Keluar',
+                                text: 'Apakah Anda yakin ingin keluar?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#19295C',
+                                confirmButtonText: 'Ya, Keluar!',
+                                cancelButtonText: 'Batal',
+                                reverseButtons: true
+                            })
+
+                            .then(r => {
+
+                                if (r.isConfirmed) {
+
+                                    localStorage.removeItem('currentUser');
+
+                                    localStorage.removeItem('id_guru');
+                                    localStorage.removeItem('id_siswa');
+                                    localStorage.removeItem('id_admin');
+
+                                    window.location.href = '../login.html';
+                                }
+                            });
+                        });
+                    }
+
+
+                // LOAD DETAIL ABSENSI
+                async function loadDetailAbsensi() {
+
+                    const user = JSON.parse(localStorage.getItem('currentUser'));
+
+                    if (!user || user.role !== 'siswa') {
+                        window.location.href = '../login.html';
+                    }
+                    console.log("DATA USER:", user);
+                    const nisn = user.nip;
+                    console.log("NISN SISWA:", nisn);
+                    const params = new URLSearchParams(
+                    window.location.search
+                    );
+
+                    const idJadwal =
+                        params.get('id_jadwal') ||
+                        params.get('id');
+
+                    console.log("ID JADWAL:", idJadwal);
+
+                    const tbody = document.getElementById('tbodyAbsensi');
+
+                    try {
+
+                        // AMBIL DETAIL JADWAL DULU
+                        const jadwalResponse = await fetch(
+                            `https://hadirly-backend.vercel.app/api/jadwal-detail?id_jadwal=${idJadwal}`
+                        );
+
+                        const jadwalData = await jadwalResponse.json();
+
+                        // TAMPILKAN INFO MAPEL
+                        if (jadwalData) {
+
+                            document.getElementById('judulMapel').innerText =
+                                jadwalData.nama_mapel || 'Detail Kehadiran';
+
+                            document.getElementById('subMapel').innerText =
+                                `${jadwalData.nama_guru || '-'} • ${jadwalData.hari || '-'} • ${jadwalData.jam || '-'}`;
+                        }
+
+                        // AMBIL ABSENSI SISWA
+                        const response = await fetch(
+                            `https://hadirly-backend.vercel.app/api/absensi-siswa?id_jadwal=${idJadwal}&nisn_siswa=${nisn}`
+                        );
+
+                        const data = await response.json();
+
+                        // JIKA BELUM ADA ABSENSI
+                        if (!Array.isArray(data) || data.length === 0) {
+
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="3" style="text-align:center;">
+                                        Guru belum melakukan konfirmasi kehadiran
+                                    </td>
+                                </tr>
+                            `;
+
+                            return;
+                        }
+
+                        tbody.innerHTML = '';
+
+                        data.forEach((item, index) => {
+
+                            let badgeClass = '';
+
+                            if (item.status === 'H') {
+                                badgeClass = 'hadir';
+                            } else if (item.status === 'S') {
+                                badgeClass = 'sakit';
+                            } else if (item.status === 'I') {
+                                badgeClass = 'izin';
+                            } else {
+                                badgeClass = 'alpha';
+                            }
+
+                            tbody.innerHTML += `
+                                <tr>
+
+                                    <td>${index + 1}</td>
+
+                                    <td>
+                                        ${new Date(item.tanggal)
+                                            .toLocaleDateString('id-ID')}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge-status ${badgeClass}">
+                                            ${item.status}
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            `;
+                        });
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="3"
+                                    style="text-align:center;color:red;">
+                                    Gagal memuat data
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }
+
+                document.addEventListener(
+                    'DOMContentLoaded',
+                    syncProfile
+                );
+
+                document.addEventListener(
+                    'DOMContentLoaded',
+                    loadDetailAbsensi
+                );
+
+                // FUNGSI FILTER BULAN (Menyaring baris tabel yang sudah ada)
+                document.getElementById('filterBulan').addEventListener('change', function() {
+                    const selectedMonth = this.value; // Ambil nilai bulan (0-11 atau 'all')
+                    const tbody = document.getElementById('tbodyAbsensi');
+                    const rows = tbody.getElementsByTagName('tr');
+
+                    for (let i = 0; i < rows.length; i++) {
+                        const dateCell = rows[i].getElementsByTagName('td')[1];
+                        
+                        if (dateCell) {
+                            const dateText = dateCell.innerText || dateCell.textContent;
+                            if (dateText.includes('/') || dateText.includes('-') || dateText.includes('.')) {
+                                const parts = dateText.split(/[/.-]/);
+                                const monthInData = parseInt(parts[1]) - 1; 
+
+                                if (selectedMonth === 'all' || monthInData.toString() === selectedMonth) {
+                                    rows[i].style.display = ""; 
+                                } else {
+                                    rows[i].style.display = "none"; 
+                                }
+                            }
+                        }
+                    }
+                });
+        </script>
+        <script src="/auth.js"></script>
+    </body>
+</html>

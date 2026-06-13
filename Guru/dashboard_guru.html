@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard Absensi Modern - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="../style.css" />
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+
+            html, body {
+                background: #f0f2f5;
+                overflow-x: hidden;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* SIDEBAR  */
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                width: 260px;
+                background: #11101d;
+                z-index: 1000;
+                transition: all 0.5s ease;
+                overflow-y: auto;
+                left: 0;
+            }
+            .sidebar.close {
+                left: -260px;
+            }
+
+            .sidebar .logo-details {
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+                width: 100%;
+                background: #f0f2f5;
+            }
+
+            .sidebar .logo-details img {
+                height: 40px;
+                width: auto;
+                object-fit: contain;
+                margin-right: 12px;
+            }
+
+            .sidebar .logo-details .logo_name {
+                color: #134354;
+                font-size: 24px;
+                font-weight: 700;
+            }
+
+            .sidebar .nav-links {
+                padding: 20px 0;
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                min-height: calc(100% - 70px);
+            }
+
+            .sidebar .nav-links li a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                padding: 12px 20px;
+                transition: all 0.4s ease;
+            }
+
+            .sidebar .nav-links li a i {
+                min-width: 50px;
+                text-align: center;
+                color: #fff;
+                font-size: 18px;
+                opacity: 0.7;
+            }
+
+            .sidebar .nav-links li a .link_name {
+                color: #fff;
+                font-size: 15px;
+            }
+            .sidebar .nav-links li a:hover,
+            .sidebar .nav-links li a.active {
+                background: #1d1b31;
+            }
+            .sidebar .nav-links li a:hover i,
+            .sidebar .nav-links li a.active i {
+                opacity: 1;
+                color: #4481eb;
+            }
+
+            .sidebar .nav-links .log_out {
+                border-top: 1px solid #2c2e3e;
+                margin-top: auto;
+                margin-bottom: 20px;
+            }
+
+            /* --- MAIN CONTENT & NAVBAR ASLI --- */
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: all 0.5s ease;
+                position: relative;
+            }
+
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 70px;
+                background: #fff;
+                position: fixed;
+                width: calc(100% - 260px);
+                top: 0;
+                z-index: 100;
+                padding: 0 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: all 0.5s ease;
+            }
+
+            .navbar.w-100 {
+                width: 100%;
+                left: 0;
+            }
+
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .school-name {
+                font-weight: 600;
+                color: #11101d;
+                border-right: 2px solid #e0e0e0;
+                padding-right: 30px;
+            }
+
+            .profile-details {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .profile-details img {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+
+            .profile-text {
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+            }
+
+            .admin_name {
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .role {
+                font-size: 11px;
+                color: #707070;
+            }
+
+            /* Style Dropdown Navbar */
+            .profile-dropdown {
+                position: relative;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .dropdown-menu {
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #fff;
+                width: 180px;
+                padding: 10px 0;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                list-style: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1001;
+                border: 1px solid #f1f5f9;
+            }
+            .dropdown-menu.active {
+                opacity: 1;
+                visibility: visible;
+                top: 70px;
+            }
+            .dropdown-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 20px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+            }
+            .dropdown-menu li a:hover {
+                background: #f0f7ff;
+                color: #4481eb;
+            }
+            .dropdown-menu hr {
+                border: 0;
+                border-top: 1px solid #eee;
+                margin: 5px 0;
+            }
+            #navProfileImg {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+
+            .container {
+                padding: 30px;
+                flex: 1;
+            }
+
+            .announcement {
+                margin-top: 80px;
+                background: linear-gradient(45deg, #4481eb, #04befe);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 12px;
+                margin-bottom: 25px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                box-shadow: 0 4px 15px rgba(68, 129, 235, 0.2);
+            }
+            .welcome-box {
+                background: #fff;
+                /* Kurangi padding atas-bawah dari 25px menjadi 15px */
+                padding: 15px 25px;
+                border-radius: 15px;
+                margin-bottom: 20px; /* Jarak ke bubble bawah juga dikurangi sedikit */
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .rekap-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .rekap-card {
+                background: #fff;
+                /* Ubah 20px (atas bawah) menjadi 12px atau 15px saja */
+                padding: 12px 20px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+                transition: transform 0.3s ease;
+            }
+            .rekap-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .progress-circle {
+                width: 55px; /* Sesuaikan ukuran agar pas di grid */
+                height: 55px;
+                border-radius: 50%;
+                /* Gunakan border tebal untuk warna utama */
+                border: 5px solid #28a745;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: white;
+                flex-shrink: 0;
+            }
+
+            .progress-circle span {
+                font-size: 13px;
+                font-weight: 700;
+                color: #28a745;
+            }
+
+            .icon-box {
+                padding: 15px;
+                border-radius: 12px;
+                font-size: 24px;
+            }
+
+            /* --- KARTU INSTRUKSI ABSEN (VERSI BARU) --- */
+            .absensi-status-card {
+                background: #fff;
+                padding: 50px 25px;
+                border-radius: 15px;
+                margin-bottom: 25px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .absensi-status-card i {
+                font-size: 100px;
+                color: #94a3b8;
+                margin-bottom: 10px;
+            }
+
+            .btn-status-active {
+                background: linear-gradient(45deg, #4481eb, #04befe);
+                color: white;
+                padding: 12px 40px;
+                border-radius: 12px;
+                text-decoration: none;
+                font-size: 15px;
+                font-weight: 700;
+                display: inline-block;
+                border: none;
+            }
+            .btn-status-disabled {
+                background: #94a3b8;
+                color: white;
+                padding: 12px 40px;
+                border-radius: 12px;
+                text-decoration: none;
+                font-size: 15px;
+                font-weight: 700;
+                text-transform: uppercase;
+                cursor: not-allowed;
+                border: none;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .absensi-status-card p {
+                color: #707070;
+                font-size: 14px;
+            }
+            .btn-disabled {
+                background-color: #b2bec3;
+                color: white;
+                padding: 12px 40px;
+                border-radius: 12px;
+                text-decoration: none;
+                font-size: 15px;
+                font-weight: 700;
+                pointer-events: none;
+                display: inline-block;
+                border: none;
+            }
+
+            .jadwal-container {
+                background: #fff;
+                padding: 25px;
+                border-radius: 15px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th {
+                text-align: left;
+                padding: 15px;
+                background: #f8f9fa;
+                color: #707070;
+                font-size: 13px;
+                text-transform: uppercase;
+            }
+            td {
+                padding: 15px;
+                border-bottom: 1px solid #eee;
+                font-size: 14px;
+            }
+
+            .badge {
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 600;
+            }
+            .badge-success {
+                background: #e8f5e9;
+                color: #28a745;
+            }
+            .badge-warning {
+                background: #fff3e0;
+                color: #ff9800;
+            }
+
+            /* Tambahkan ini di bagian bawah <style> kamu */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10002; 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-content {
+                z-index: 10003;
+                background: white;
+            }
+
+            .absensi-grid-2col {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+            @media (max-width: 480px) {
+                .absensi-grid-2col {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .navbar {
+                    padding: 0 15px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 100% !important; 
+                    left: 0 !important;
+                }
+
+                .navbar .menu_icon {
+                    display: block;
+                    cursor: pointer;
+                    font-size: 20px;
+                }
+                .header-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .profile-details {
+                    margin-left: auto;
+                }
+                .sidebar {
+                    left: -260px !important; 
+                }
+                .sidebar.show {
+                    left: 0 !important;  
+                }
+                .main-content {
+                    margin-left: 0 !important; 
+                    width: 100% !important;   
+                    padding: 10px;
+                }
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+
+                .welcome-box {
+                    flex-direction: column;
+                    text-align: center;
+                    gap: 15px;
+                    padding: 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="dashboard_guru.html"class="active">
+                        <i class="fas fa-home"></i>
+                        <span class="link_name">Halaman Awal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="jadwal.html">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="link_name">Jadwal Mapel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="izin.html">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="link_name">Masukkan Izin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="riwayat.html">
+                        <i class="fas fa-history"></i>
+                        <span class="link_name">Riwayat Izin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="profile.html">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="link_name">Profil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="laporan.html">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="link_name">Laporan</span>
+                    </a>
+                </li>
+                <li class="log_out">
+                    <a href="#" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link_name">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <nav class="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                    <span class="dashboard-title"><b>Halaman Awal</b></span>
+                </div>
+
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+                    <div class="profile-details profile-dropdown">
+                        <div class="profile-text">
+                            <span class="admin_name" id="nav-user-name">Memuat...</span>
+                        </div>
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            alt="Profile"
+                            id="navProfileImg" />
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="profile.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+                            <hr />
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div class="announcement">
+                    <i class="fas fa-bullhorn fa-lg"></i>
+                    <div>
+                        <h4 style="font-size: 14px">Info Akademik</h4>
+                        <p style="font-size: 12px; opacity: 0.9">
+                            Jangan lupa melakukan absensi tepat waktu sebelum jam pelajaran dimulai!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="welcome-box">
+                    <div>
+                        <h2 id="welcome-name" style="font-weight: 600">Selamat Datang! 👋</h2>
+                        <p style="color: #707070; margin-top: 5px">
+                            Cek jadwal dan kehadiranmu hari ini.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="rekap-grid">
+                    <div class="rekap-card">
+                        <div class="progress-circle" id="circle-progress" style="border-color: #94a3b8">
+                            <span id="presensi-persen" style="color: #11101d; font-weight: 600">0%</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #707070">Presensi Bulanan</span>
+                            <h3 id="presensi-status" style="font-size: 18px; font-weight: 600; color: #94a3b8">
+                                Belum Ada Data
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="rekap-card" style="border-left: 5px solid #ffc107">
+                        <div class="icon-box" style="background: #fff9e6; color: #ffc107">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #707070">Terlambat</span>
+                            <h3 style="font-size: 20px">
+                                <span id="jml-terlambat">0</span>
+                                <small style="font-size: 12px; font-weight: 400">kali</small>
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="rekap-card" style="border-left: 5px solid #4481eb">
+                        <div class="icon-box" style="background: #eef4ff; color: #4481eb">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #707070">Izin / Sakit</span>
+                            <h3 style="font-size: 20px">
+                                <span id="jml-izin-sakit">0</span>
+                                <small style="font-size: 12px; font-weight: 400">hari</small>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="absensi-status-card">
+                    <i class="fas fa-camera" id="cameraIcon" style="color: #4481eb"></i>
+                    <a href="absen_kamera.html" id="btnAbsen" class="btn-status-active">
+                        Ambil Presensi Sekarang
+                    </a>
+                    <p id="absenInstruction">Pastikan posisi wajah terlihat jelas di kamera.</p>
+                </div>
+
+                <div class="absensi-grid-2col">
+                    <div
+                        id="cardMasuk"
+                        style="
+                            background: #fff;
+                            padding: 15px;
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+                            border-left: 5px solid #94a3b8;
+                        ">
+                        <i class="fas fa-sign-in-alt" id="iconMasuk" style="color: #94a3b8"></i>
+                        <div>
+                            <p style="font-size: 11px; color: #707070; margin-bottom: 2px">
+                                Absen Masuk
+                            </p>
+                            <h4 style="font-size: 14px">
+                                <span id="waktuMasuk">-- : --</span>
+                                <span
+                                    id="badgeMasuk"
+                                    style="
+                                        background: #f1f5f9;
+                                        color: #94a3b8;
+                                        font-size: 9px;
+                                        padding: 2px 8px;
+                                        border-radius: 10px;
+                                    ">
+                                    Belum
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div
+                        id="cardPulang"
+                        style="
+                            background: #fff;
+                            padding: 15px;
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+                            border-left: 5px solid #94a3b8;
+                        ">
+                        <i class="fas fa-sign-out-alt" id="iconPulang" style="color: #94a3b8"></i>
+                        <div>
+                            <p style="font-size: 11px; color: #707070; margin-bottom: 2px">
+                                Absen Pulang
+                            </p>
+                            <h4 style="font-size: 14px">
+                                <span id="waktuPulang">-- : --</span>
+                                <span
+                                    id="badgePulang"
+                                    style="
+                                        background: #f1f5f9;
+                                        color: #94a3b8;
+                                        font-size: 9px;
+                                        padding: 2px 8px;
+                                        border-radius: 10px;
+                                    ">
+                                    Belum
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="jadwal-container">
+                    <div style="margin-bottom: 15px">
+                        <h3
+                            id="current-date-header"
+                            style="
+                                font-weight: 600;
+                                font-size: 16px;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                            ">
+                            <i class="fas fa-clock"></i>
+                            Memuat tanggal...
+                        </h3>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #eee">
+                                <th
+                                    style="
+                                        text-align: left;
+                                        padding: 12px;
+                                        color: #888;
+                                        font-size: 13px;
+                                        font-weight: 500;
+                                        text-transform: uppercase;
+                                    ">
+                                    Jam
+                                </th>
+                                <th
+                                    style="
+                                        text-align: left;
+                                        padding: 12px;
+                                        color: #888;
+                                        font-size: 13px;
+                                        font-weight: 500;
+                                        text-transform: uppercase;
+                                    ">
+                                    Mata Pelajaran
+                                </th>
+                                <th
+                                    style="
+                                        text-align: left;
+                                        padding: 12px;
+                                        color: #888;
+                                        font-size: 13px;
+                                        font-weight: 500;
+                                        text-transform: uppercase;
+                                    ">
+                                    Kelas
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-table-body">
+                            <tr>
+                                <td
+                                    colspan="3"
+                                    style="text-align: center; padding: 20px; color: #888">
+                                    Memuat jadwal hari ini...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const user = JSON.parse(localStorage.getItem('currentUser'));
+                        if (!user || user.role !== 'guru') {
+                            window.location.href = '../login.html';
+                        }
+                        const nip = user.nip || '';
+                        const nama = user.nama || '';
+
+                        // Populate welcome & navbar name
+                        const welcomeName = document.getElementById('welcome-name');
+                        if (welcomeName && nama) welcomeName.textContent = `Selamat Datang, ${nama}! 👋`;
+                        const navUserName = document.getElementById('nav-user-name');
+                        if (navUserName && nama) navUserName.textContent = nama;
+
+                        // Profile photo
+                        const savedPhoto = localStorage.getItem('userPhoto');
+                        if (savedPhoto) {
+                            const navImg = document.getElementById('navProfileImg');
+                            if (navImg) navImg.src = savedPhoto;
+                        }
+
+                        const btnMenu = document.querySelector('#btn_menu');
+                        const sidebar = document.querySelector('.sidebar');
+                        const mainContent = document.querySelector('.main-content');
+                        const navbar = document.querySelector('.navbar');
+                        const btnAbsen = document.getElementById('btnAbsen');
+                        const cameraIcon = document.getElementById('cameraIcon');
+                        const instruction = document.getElementById('absenInstruction');
+                        const cardPulang = document.getElementById('cardPulang');
+                        const iconPulang = document.getElementById('iconPulang');
+                        const profileDropdown = document.querySelector('.profile-dropdown');
+                        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+                        function cekWaktuAbsen() {
+                            if (!btnAbsen) return;
+                            const jam = new Date().getHours();
+                            if (jam >= 6 && jam < 12) {
+                                updateButtonAbsen('Absen Masuk Sekarang', 'absen_kamera.html', 'btn-status-active', '#4481eb', 'Waktunya absen masuk. Silahkan ambil foto selfie.');
+                            } else if (jam >= 13 && jam < 21) {
+                                updateButtonAbsen('Absen Pulang Sekarang', 'absen_kamera.html', 'btn-status-active', '#4481eb', 'Waktunya absen pulang. Hati-hati di jalan!');
+                                if (cardPulang) cardPulang.style.borderLeft = '5px solid #4481eb';
+                                if (iconPulang) iconPulang.style.color = '#4481eb';
+                            } else {
+                                updateButtonAbsen('BELUM WAKTUNYA ABSEN', '#', 'btn-disabled', '#94a3b8', 'Silahkan masuk ke halaman Absen.');
+                            }
+                        }
+
+                        function updateButtonAbsen(text, href, className, color, info) {
+                            btnAbsen.innerText = text;
+                            btnAbsen.href = href;
+                            btnAbsen.className = className;
+                            btnAbsen.style.pointerEvents = href === '#' ? 'none' : 'auto';
+                            if (cameraIcon) cameraIcon.style.color = color;
+                            if (instruction) instruction.innerText = info;
+                        }
+
+                        cekWaktuAbsen();
+                        setInterval(cekWaktuAbsen, 60000);
+
+                        if (btnMenu) {
+                            btnMenu.addEventListener('click', () => {
+                                if (window.innerWidth <= 768) {
+                                    sidebar.classList.toggle('show');
+                                } else {
+                                    sidebar.classList.toggle('close');
+                                    if (mainContent) mainContent.classList.toggle('m-0');
+                                    if (navbar) navbar.classList.toggle('w-100');
+                                }
+                            });
+                        }
+
+                        if (profileDropdown) {
+                            profileDropdown.addEventListener('click', (e) => {
+                                dropdownMenu.classList.toggle('active');
+                                e.stopPropagation();
+                            });
+                        }
+
+                        document.addEventListener('click', (e) => {
+                            if (window.innerWidth <= 768 && sidebar && !sidebar.contains(e.target) && btnMenu && !btnMenu.contains(e.target)) {
+                                sidebar.classList.remove('show');
+                            }
+                            if (profileDropdown && !profileDropdown.contains(e.target)) {
+                                dropdownMenu.classList.remove('active');
+                            }
+                        });
+
+                        const logoutBtn = document.getElementById('logout-btn');
+                        if (logoutBtn) {
+                            logoutBtn.addEventListener('click', (e) => {
+                                e.preventDefault();
+
+                                Swal.fire({
+                                    title: 'Konfirmasi Keluar',
+                                    text: 'Apakah Anda yakin ingin keluar?',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#19295C',
+                                    confirmButtonText: 'Ya, Keluar!',
+                                    cancelButtonText: 'Batal',
+                                    reverseButtons: true
+                                }).then((r) => {
+
+                                    if (r.isConfirmed) {
+
+                                        localStorage.removeItem('currentUser');
+
+                                        localStorage.removeItem('id_guru');
+                                        localStorage.removeItem('id_siswa');
+                                        localStorage.removeItem('id_admin');
+                                    
+                                        window.location.href = '../login.html';
+                                    }
+                                });
+                            });
+                        }
+
+                        const logoutDropdown = document.getElementById('logout-dropdown');
+                        if (logoutDropdown && logoutBtn) {
+                            logoutDropdown.addEventListener('click', () => logoutBtn.click());
+                        }
+                        updateDashboardTime();
+                        setInterval(updateDashboardTime, 1000);
+
+                        loadRekap(nip, nama);
+                        loadAbsenHariIni(nip);
+                        fetchJadwalHariIni(nip);
+                    });
+
+                    function updateDashboardTime() {
+                    const now = new Date();
+                    
+                    // Format Tanggal
+                    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                    const formatIndo = now.toLocaleDateString('id-ID', options);
+                    
+                    // Tambahkan Jam, Menit, dan Detik
+                    const jam = String(now.getHours()).padStart(2, '0');
+                    const menit = String(now.getMinutes()).padStart(2, '0');
+                    const detik = String(now.getSeconds()).padStart(2, '0');
+                    const waktuSekarang = `${jam}:${menit}:${detik}`;
+
+                    const headerJadwal = document.getElementById('current-date-header');
+                    if (headerJadwal) {
+                        headerJadwal.innerHTML = `<i class="fas fa-clock"></i> Jadwal Hari ini, ${formatIndo} | ${waktuSekarang}`;
+                    }
+                }
+                    
+                   async function loadRekap(nip, nama) {
+    if (!nip) return;
+    const now = new Date();
+    const jam = new Date().toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    }).split(':')[0];
+
+    const menit = new Date().toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    }).split(':')[1];
+
+    const waktuTampil = `${jam}:${menit}`;
+    const bulan = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    
+    try {
+        const res = await fetch(`https://hadirly-backend.vercel.app/api/guru/rekap-laporan?nip=${encodeURIComponent(nip)}&nama=${encodeURIComponent(nama)}&bulan=${bulan}`);
+        const json = await res.json();
+        
+        if (!json.success) return;
+
+        // --- SOLUSI DISINI ---
+        // Antisipasi jika backend membungkus datanya di dalam objek `.data` atau langsung di `json`
+        const sourceData = json.data ? json.data : json;
+
+        // Berikan fallback `|| 0` agar tidak memicu undefined jika database bernilai null
+        const hadir = sourceData.hadir || 0;
+        const sakit = sourceData.sakit || 0;
+        const izin = sourceData.izin || 0;
+
+        const HARI_KERJA = 20;
+        
+        // Perhitungan persen yang aman dari NaN
+        const persen = Math.min(100, Math.round((Number(hadir) / HARI_KERJA) * 100)) || 0;
+        const totalIzinSakit = Number(sakit) + Number(izin);
+
+        // Pencarian Elemen UI
+        const circleEl = document.getElementById('circle-progress');
+        // fallback selektor jika kamu menggunakan class pembungkus di dashboard baru
+        const persenEl = document.getElementById('presensi-persen') || document.querySelector('.rekap-card:nth-child(1) span');
+        const statusEl = document.getElementById('presensi-status') || document.getElementById('presensi-text') || document.querySelector('.rekap-card:nth-child(1) h3');
+        const izinEl = document.getElementById('jml-izin-sakit') || document.getElementById('izin-sakit-text') || document.querySelector('.rekap-card:nth-child(3) h3');
+
+        // Render data ke UI
+        if (persenEl) persenEl.textContent = `${persen}%`;
+        if (statusEl) statusEl.textContent = `${hadir} / ${HARI_KERJA} Hari`;
+        if (izinEl) {
+            // Jika elemen h3 pembungkus bawaanmu berisi teks "NaN hari", kita pasang format yang rapi
+            izinEl.textContent = `${totalIzinSakit} hari`;
+        }
+
+        if (circleEl) {
+            const color = persen >= 80 ? '#28a745' : persen >= 60 ? '#ffc107' : '#dc3545';
+            circleEl.style.borderColor = color;
+            if (persenEl) persenEl.style.color = color;
+            if (statusEl) statusEl.style.color = color;
+        }
+    } catch (err) {
+        console.error('Gagal memuat rekap:', err);
+    }
+}
+                        async function loadAbsenHariIni(nip) {
+                            if (!nip) return;
+                            try {
+                                const res = await fetch(`https://hadirly-backend.vercel.app/api/guru/absen-hari-ini?nip=${encodeURIComponent(nip)}`);
+                                const json = await res.json();
+                                const data = json.data || {}; 
+
+                                // --- BAGIAN ABSEN MASUK ---
+                                const waktuMasukEl = document.getElementById('waktuMasuk');
+                                const cardMasukEl = document.getElementById('cardMasuk');
+                                const badgeMasuk = document.getElementById('badgeMasuk');
+                                const iconMasuk = document.getElementById('iconMasuk');
+
+                                if (data.jam_masuk) {
+                                    if (waktuMasukEl) waktuMasukEl.textContent = data.jam_masuk.slice(0, 5);
+                                    if (cardMasukEl) cardMasukEl.style.borderLeft = '5px solid #28a745';
+                                    if (iconMasuk) iconMasuk.style.color = '#28a745';
+                                    if (badgeMasuk) {
+                                        badgeMasuk.textContent = data.status || 'Hadir';
+                                        badgeMasuk.style.background = '#d4edda';
+                                        badgeMasuk.style.color = '#28a745';
+                                    }
+                                } else {
+                                    if (waktuMasukEl) waktuMasukEl.textContent = "-- : --";
+                                    if (cardMasukEl) cardMasukEl.style.borderLeft = '5px solid #94a3b8';
+                                    if (iconMasuk) iconMasuk.style.color = '#94a3b8';
+                                    if (badgeMasuk) {
+                                        badgeMasuk.textContent = "Belum";
+                                        badgeMasuk.style.background = '#f1f5f9';
+                                        badgeMasuk.style.color = '#94a3b8';
+                                    }
+                                }
+
+                                // --- BAGIAN ABSEN PULANG ---
+                                const waktuPulangEl = document.getElementById('waktuPulang');
+                                const cardPulangEl = document.getElementById('cardPulang');
+                                const badgePulang = document.getElementById('badgePulang');
+                                const iconPulang = document.getElementById('iconPulang');
+
+                                if (data.jam_pulang) {
+                                    if (waktuPulangEl) waktuPulangEl.textContent = data.jam_pulang.slice(0, 5);
+                                    if (cardPulangEl) cardPulangEl.style.borderLeft = '5px solid #007bff';
+                                    if (iconPulang) iconPulang.style.color = '#007bff';
+                                    if (badgePulang) {
+                                        badgePulang.textContent = 'Selesai';
+                                        badgePulang.style.background = '#cce5ff';
+                                        badgePulang.style.color = '#007bff';
+                                    }
+                                } else {
+                                    if (waktuPulangEl) waktuPulangEl.textContent = "-- : --";
+                                    if (cardPulangEl) cardPulangEl.style.borderLeft = '5px solid #94a3b8';
+                                    if (iconPulang) iconPulang.style.color = '#94a3b8';
+                                    if (badgePulang) {
+                                        badgePulang.textContent = "Belum";
+                                        badgePulang.style.background = '#f1f5f9';
+                                        badgePulang.style.color = '#94a3b8';
+                                    }
+                                }
+
+                            } catch (err) {
+                                console.error('Gagal memuat absen hari ini:', err);
+                            }
+                        }
+
+                    async function fetchJadwalHariIni(nip) {
+                        const tableBody = document.getElementById('schedule-table-body');
+                        if (!tableBody) return;
+                        try {
+                            const hariIni = new Date().toLocaleDateString('id-ID', { weekday: 'long' });
+                            const response = await fetch(`https://hadirly-backend.vercel.app/api/jadwal?id_guru=${encodeURIComponent(nip)}`);
+                            const allJadwal = await response.json();
+                            const jadwalHariIni = allJadwal.filter(
+                                (item) => item.hari.toLowerCase() === hariIni.toLowerCase()
+                            );
+
+                            if (jadwalHariIni.length === 0) {
+                                tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 15px;">Tidak ada jadwal mengajar hari ini.</td></tr>`;
+                                return;
+                            }
+
+                            tableBody.innerHTML = jadwalHariIni.map((item) => `
+                                <tr>
+                                    <td style="padding: 12px;">${item.jam}</td>
+                                    <td style="padding: 12px; font-weight: 500;">${item.nama_mapel}</td>
+                                    <td style="padding: 12px;"><span class="badge-kelas">${item.kelas}</span></td>
+                                </tr>
+                            `).join('');
+                        } catch (error) {
+                            console.error('Gagal memuat jadwal dashboard:', error);
+                            if (tableBody) tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Gagal memuat data.</td></tr>`;
+                        }
+                    }
+                </script>
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script src="/auth.js"></script>
+            </div>
+        </div>
+    </body>
+</html>

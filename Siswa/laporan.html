@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Laporan Kehadiran - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+            body {
+                background: #f8fafc;
+                overflow-x: hidden;
+            }
+
+            /* --- Sidebar --- */
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                width: 260px;
+                background: #11101d;
+                z-index: 100;
+                transition: all 0.5s ease;
+            }
+            .sidebar.close {
+                left: -260px;
+            }
+            .sidebar .logo-details {
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                background: #f0f2f5;
+            }
+            .sidebar .logo-details img {
+                height: 35px;
+                width: auto;
+                margin-right: 12px;
+            }
+            .sidebar .logo-details .logo_name {
+                color: #134354;
+                font-size: 24px;
+                font-weight: 700;
+            }
+
+            .sidebar .nav-links {
+                padding: 20px 0;
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                height: calc(100% - 70px);
+            }
+            .sidebar .nav-links li a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                padding: 12px 20px;
+                transition: 0.4s;
+                color: #fff;
+            }
+            .sidebar .nav-links li a i {
+                min-width: 50px;
+                text-align: center;
+                font-size: 18px;
+                opacity: 0.7;
+            }
+            .sidebar .nav-links li a .link_name {
+                font-size: 15px;
+            }
+            .sidebar .nav-links li a:hover,
+            .sidebar .nav-links li a.active {
+                background: #1d1b31;
+            }
+            .sidebar .nav-links li a:hover i,
+            .sidebar .nav-links li a.active i {
+                opacity: 1;
+                color: #4481eb;
+            }
+            .sidebar .nav-links .log_out {
+                border-top: 1px solid #2c2e3e;
+                margin-top: auto;
+                margin-bottom: 20px;
+            }
+
+            /* Default (Desktop) → disembunyikan */
+            .menu_icon {
+                display: none;
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+            }
+
+            /* Mode HP */
+            @media (max-width: 768px) {
+                .menu_icon {
+                    display: block;
+                }
+            }
+
+            /* --- Main Content & Navbar --- */
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: 0.5s;
+            }
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 70px;
+                background: #fff;
+                position: fixed;
+                width: calc(100% - 260px);
+                top: 0;
+                z-index: 99;
+                padding: 0 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: all 0.5s ease;
+            }
+            .navbar.w-100 {
+                width: 100%;
+                left: 0;
+            }
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+            }
+
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            .school-name {
+                font-weight: 600;
+                border-right: 2px solid #e0e0e0;
+                padding-right: 20px;
+            }
+            .profile-dropdown {
+                position: relative;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            #navProfileImg {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+            .profile-text {
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+                line-height: 1.2;
+            }
+            .admin_name {
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .role {
+                font-size: 11px;
+                color: #707070;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #fff;
+                width: 180px;
+                padding: 10px 0;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                list-style: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1100;
+                border: 1px solid #f1f5f9;
+            }
+            .dropdown-menu.active {
+                opacity: 1;
+                visibility: visible;
+                top: 70px;
+            }
+            .dropdown-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 20px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+                transition: 0.2s;
+            }
+            .dropdown-menu li a:hover {
+                background: #f0f7ff;
+                color: #4481eb;
+            }
+            .dropdown-menu hr {
+                border: 0;
+                border-top: 1px solid #eee;
+                margin: 5px 0;
+            }
+
+            /* --- Container & Filter --- */
+            .container {
+                padding: 90px 30px 30px 30px;
+            }
+
+            .filter-card {
+                background: #fff;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 25px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                display: flex;
+                gap: 20px;
+                align-items: flex-end;
+                flex-wrap: wrap;
+            }
+            .filter-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .filter-group label {
+                font-size: 12px;
+                font-weight: 600;
+                color: #64748b;
+            }
+            .filter-group select,
+            .filter-group input {
+                padding: 10px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                outline: none;
+                background: #fcfcfc;
+            }
+
+            .btn-print {
+                background: #10b981;
+                color: white;
+                padding: 10px 22px;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: 0.3s;
+                height: 43px;
+            }
+            .btn-print:hover {
+                background: #059669;
+                transform: translateY(-2px);
+            }
+
+            /* --- Kertas Laporan --- */
+            .report-paper {
+                background: #fff;
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                border: 1px solid #e2e8f0;
+            }
+            .report-header {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 20px;
+            }
+
+            /* Layout Flexbox untuk info Nama & Periode (Satu Baris) */
+            .report-info-grid {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 25px;
+                font-size: 14px;
+                gap: 20px;
+            }
+
+            /* Responsive Table Wrapper */
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-top: 15px;
+            }
+
+            /* Gaya Tabel (Dipertahankan sesuai keinginanmu) */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            table th {
+                background: #f8fafc;
+                padding: 12px;
+                border: 1px solid #cbd5e1;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            table td {
+                padding: 12px;
+                border: 1px solid #cbd5e1;
+                text-align: center;
+                font-size: 13px;
+            }
+
+            /* --- Media Queries Mobile --- */
+            @media (max-width: 768px) {
+                .sidebar {
+                    left: -260px;
+                }
+                .sidebar.show {
+                    left: 0;
+                }
+                .main-content {
+                    margin-left: 0;
+                    width: 100%;
+                }
+                .navbar {
+                    width: 100%;
+                    left: 0;
+                    padding: 0 15px;
+                }
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+                .container {
+                    padding: 90px 15px 20px 15px;
+                }
+                .report-paper {
+                    padding: 25px 15px;
+                }
+
+                /* Di HP, Nama & Periode akan menumpuk atas-bawah agar tidak sesak */
+                .report-info-grid {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                .report-info-grid div:last-child {
+                    text-align: left !important;
+                }
+            }
+
+            @media print {
+                .sidebar,
+                .navbar,
+                .filter-card,
+                .btn-print,
+                .sidebar-overlay {
+                    display: none !important;
+                }
+                .main-content {
+                    margin: 0 !important;
+                    width: 100% !important;
+                }
+                .container {
+                    padding: 0 !important;
+                }
+                .report-paper {
+                    box-shadow: none !important;
+                    border: none !important;
+                    padding: 0 !important;
+                }
+                .report-info-grid {
+                    flex-direction: row !important;
+                } /* Pastikan tetap satu baris saat print */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar-overlay" id="overlay"></div>
+
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="dashboard_siswa.html">
+                        <i class="fas fa-home"></i>
+                        <span class="link_name">Halaman Awal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="jadwal.html">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="link_name">Jadwal Mapel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="izin.html">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="link_name">Masukkan Izin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="profil.html">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="link_name">Profil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="laporan.html" class="active">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="link_name">Laporan</span>
+                    </a>
+                </li>
+                <li class="log_out">
+                    <a href="#" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link_name">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content" id="main_content">
+            <nav class="navbar" id="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                    <span class="dashboard-title"><b>Laporan Presensi</b></span>
+                </div>
+
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-text">
+                            <span class="admin_name" id="nav-user-name">Memuat...</span>
+                            <span class="role" id="nav-user-role">Memuat...</span>
+                        </div>
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            alt="Profile"
+                            id="navProfileImg" />
+
+                        <ul class="dropdown-menu" id="dropdownMenu">
+                            <li>
+                                <a href="profil.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+                            <hr />
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div class="filter-card">
+                    <div class="filter-group">
+                        <label for="inputBulan">Pilih Bulan & Tahun</label>
+                        <input type="month" id="inputBulan" />
+                    </div>
+                    <button class="btn-print" onclick="window.print()">
+                        <i class="fas fa-print"></i>
+                        Cetak Laporan (PDF)
+                    </button>
+                </div>
+
+                <div class="report-paper">
+                    <div class="report-header">
+                        <h2 id="reportTitle">LAPORAN KEHADIRAN SISWA</h2>
+                        <p>SMA NEGERI 14 SURABAYA</p>
+                        <p style="font-size: 12px; color: #666">
+                            Jl. Manyar Sabrangan No. 14, Surabaya
+                        </p>
+                    </div>
+
+                    <div class="report-info-grid">
+                        <div>
+                            <p>
+                                <strong>Nama:</strong>
+                                <span id="report-user-name">Memuat...</span>
+                            </p>
+                            <p>
+                                <strong>Kelas:</strong>
+                                <span id="report-user-class">Memuat...</span>
+                            </p>
+                            <p>
+                                <strong>Status:</strong>
+                                Aktif
+                            </p>
+                        </div>
+                        <div style="text-align: right">
+                            <p>
+                                <strong>Periode:</strong>
+                                <span id="currentMonth"></span>
+                            </p>
+                            <p>
+                                <strong>Tanggal Cetak:</strong>
+                                <span id="currentDate"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px">No</th>
+                                    <th style="width: 150px">Tanggal</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Pulang</th>
+                                    <th style="width: 120px">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align:center;color:#94a3b8">
+                                        <i class="fas fa-spinner fa-spin"></i> Memuat data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <!-- Baris Rekapitulasi H S I A -->
+                                <tr style="background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #cbd5e1;">
+                                    <td colspan="2" style="text-align: left; padding-left: 15px;">REKAPITULASI</td>
+                                    <td colspan="3" style="text-align: left;">
+                                        <span style="color: #10b981; margin-right: 20px;">Hadir (H): <span id="rekap-h">0</span></span>
+                                        <span style="color: #f59e0b; margin-right: 20px;">Sakit (S): <span id="rekap-s">0</span></span>
+                                        <span style="color: #3b82f6; margin-right: 20px;">Izin (I): <span id="rekap-i">0</span></span>
+                                        <span style="color: #ef4444;">Alpa (A): <span id="rekap-a">0</span></span>
+                                    </td>
+                                </tr>
+                                <!-- Baris Persentase Kehadiran -->
+                                <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                    <td colspan="2" style="text-align: left; padding-left: 15px;">PERSENTASE</td>
+                                    <td colspan="3" style="text-align: left; color: #0f172a;">
+                                        Total Kehadiran: <span id="rekap-persen">0%</span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div style="margin-top: 60px; display: flex; justify-content: flex-end">
+                        <div style="text-align: center; width: 250px">
+                            <p id="footerCityDate" style="margin-bottom: 5px"></p>
+                            <p style="margin-bottom: 60px">Mengetahui,</p>
+                            <p><strong>( Kepala Sekolah )</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+           const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!user || user.role !== 'siswa') {
+            window.location.href = '../login.html';
+        }
+
+            const nisn = user.nip || '';
+            const nama = user.nama || '';
+            const idKelas = user.id_kelas || '';
+
+            const monthNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            const inputBulan = document.getElementById('inputBulan');
+            const btnMenu = document.querySelector('#btn_menu');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('overlay');
+
+            // Sidebar
+            btnMenu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (window.innerWidth <= 768) sidebar.classList.toggle('show');
+                    else { sidebar.classList.toggle('close'); mainContent.classList.toggle('m-0'); }
+                    });
+                    document.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 768 && sidebar.classList.contains('show') && !sidebar.contains(e.target) && e.target !== btnMenu)
+                    sidebar.classList.remove('show');
+                    });
+
+            // Navbar
+            const navName = document.getElementById('nav-user-name');
+            const navRole = document.getElementById('nav-user-role');
+            const navImg = document.getElementById('navProfileImg');
+            const savedPhoto = localStorage.getItem('userPhoto');
+            if (savedPhoto && navImg) navImg.src = savedPhoto;
+            if (navName) navName.innerText = nama || 'Siswa';
+            if (navRole) navRole.innerText = `Siswa - ${idKelas}`;
+
+            // Info laporan
+            document.getElementById('report-user-name').innerText = nama;
+            document.getElementById('report-user-class').innerText = idKelas;
+
+            // Tanggal & periode
+            function updateReportContent() {
+                const val = inputBulan.value;
+                if (!val) return;
+                const [year, month] = val.split('-');
+                const monthName = monthNames[parseInt(month) - 1];
+                const today = new Date().getDate();
+                document.getElementById('currentMonth').innerText = `${monthName} ${year}`;
+                document.getElementById('currentDate').innerText = `${String(today).padStart(2,'0')}/${month}/${year}`;
+                document.getElementById('footerCityDate').innerText = `Surabaya, ${today} ${monthName} ${year}`;
+                loadRekapTable(val);
+            }
+
+            // Load rekap dari API
+            // Load rekap harian & hitung total dari API yang baru
+            async function loadRekapTable(bulan) {
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8"><i class="fas fa-spinner fa-spin"></i> Memuat detail presensi...</td></tr>';
+                
+                try {
+                    const res = await fetch(`https://hadirly-backend.vercel.app/api/siswa/rekap-laporan?nisn=${nisn}&nama=${encodeURIComponent(nama)}&bulan=${bulan}`);
+                    const json = await res.json();
+                    
+                    if (!json.success || !json.data) throw new Error('Gagal memuat data');
+                    
+                    const dataPresensi = json.data; // Sekarang berupa array log harian
+                    
+                    // Jika data kosong atau belum ada absen di bulan tersebut
+                    if (dataPresensi.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding: 20px;">Tidak ada data presensi pada periode ini.</td></tr>';
+                        document.getElementById('rekap-h').innerText = '0';
+                        document.getElementById('rekap-s').innerText = '0';
+                        document.getElementById('rekap-i').innerText = '0';
+                        document.getElementById('rekap-a').innerText = '0';
+                        document.getElementById('rekap-persen').innerText = '0%';
+                        return;
+                    }
+
+                    let htmlRows = '';
+                    let totalH = 0, totalS = 0, totalI = 0, totalA = 0;
+                    let totalPotonganPersen = 0; // Menampung penalti pengurangan persentase jika jam kosong
+
+                    // Looping baris data harian dari database
+                    dataPresensi.forEach((row, index) => {
+                        const statusSiswa = row.status ? row.status.trim() : '';
+
+                        // 1. Antisipasi jika jam_masuk atau jam_pulang bernilai null / kosong
+                        const jamMasuk = row.jam_masuk ? row.jam_masuk : '-';
+                        const jamPulang = row.jam_pulang ? row.jam_pulang : '-';
+
+                        // 2. Akumulasikan jumlah berdasarkan status & cek kelengkapan jam
+                        if (statusSiswa === 'Hadir') {
+                            totalH++; // Tetap dihitung 1 hari hadir fisik secara utuh
+
+                            // JIKA SISWA LUPA ABSEN PULANG / MASUK, KENA PENALTI PERSENTASE
+                            if (jamMasuk === '-' || jamPulang === '-') {
+                                totalPotonganPersen += 2.5; 
+                            }
+                        } 
+                        else if (statusSiswa === 'Sakit') totalS++;
+                        else if (statusSiswa === 'Izin') totalI++;
+                        else if (statusSiswa === 'Alpa') totalA++;
+
+                        const dateObj = new Date(row.tanggal);
+                        const tglFormated = String(dateObj.getDate()).padStart(2, '0') + '/' + 
+                                            String(dateObj.getMonth() + 1).padStart(2, '0') + '/' + 
+                                            dateObj.getFullYear();
+
+                        let colorStatus = '#0f172a'; 
+                        let statusTextTabel = statusSiswa;
+
+                        if (statusSiswa === 'Hadir') {
+                            if (jamMasuk === '-' || jamPulang === '-') {
+                                colorStatus = '#f59e0b'; 
+                                statusTextTabel = 'Hadir (Tidak Lengkap)';
+                            } else {
+                                colorStatus = '#10b981'; 
+                            }
+                        }
+                        else if (statusSiswa === 'Sakit') colorStatus = '#f59e0b';
+                        else if (statusSiswa === 'Izin') colorStatus = '#3b82f6';
+                        else if (statusSiswa === 'Alpa') colorStatus = '#ef4444';
+
+                        htmlRows += `
+                            <tr>
+                                <td style="text-align:center;">${index + 1}</td>
+                                <td style="text-align:center;">${tglFormated}</td>
+                                <td style="text-align:center;">${jamMasuk}</td>
+                                <td style="text-align:center;">${jamPulang}</td>
+                                <td style="text-align:center; color:${colorStatus}; font-weight:bold;">${statusTextTabel}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tbody.innerHTML = htmlRows;
+                    const hariKerjaEfektif = 20;
+                    let persenBersih = Math.round((totalH / hariKerjaEfektif) * 100);
+                    persenBersih = Math.max(0, persenBersih - totalPotonganPersen);
+                    const totalTanpaKeterangan = Math.max(0, hariKerjaEfektif - (totalH + totalS + totalI));
+
+                    document.getElementById('rekap-h').innerText = totalH;
+                    document.getElementById('rekap-s').innerText = totalS;
+                    document.getElementById('rekap-i').innerText = totalI;
+                    document.getElementById('rekap-a').innerText = totalTanpaKeterangan;
+                    document.getElementById('rekap-persen').innerText = `${persenBersih}%`;
+
+                } catch (e) {
+                    console.error(e);
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#ef4444"><i class="fas fa-exclamation-triangle"></i> Gagal mengambil detail data presensi</td></tr>';
+                }
+            }
+
+            inputBulan.addEventListener('change', updateReportContent);
+
+            // Dropdown
+            const profileDropdown = document.getElementById('profileDropdown');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            profileDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle('active'); };
+            window.onclick = (e) => { if (!e.target.closest('.profile-dropdown')) dropdownMenu.classList.remove('active'); };
+
+            // Logout
+            ['logout-btn', 'logout-dropdown'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', e => {
+                        e.preventDefault();
+
+                        Swal.fire({
+                            title: 'Konfirmasi Keluar',
+                            text: 'Apakah Anda yakin ingin keluar?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#19295C',
+                            confirmButtonText: 'Ya, Keluar!',
+                            cancelButtonText: 'Batal',
+                            reverseButtons: true
+                        })
+
+                        .then(r => {
+
+                            if (r.isConfirmed) {
+
+                                localStorage.removeItem('currentUser');
+
+                                localStorage.removeItem('id_guru');
+                                localStorage.removeItem('id_siswa');
+                                localStorage.removeItem('id_admin');
+
+                                window.location.href = '../login.html';
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Init
+            window.onload = () => {
+                const now = new Date();
+                inputBulan.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2,'0')}`;
+                updateReportContent();
+            };
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="/auth.js"></script>
+    </body>
+</html>

@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Presensi Kamera - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+            rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+            body {
+                background: #f0f2f5;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .absensi-container {
+                background: #fff;
+                width: 100%;
+                max-width: 400px;
+                padding: 30px;
+                border-radius: 20px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+
+            .status-badge {
+                display: inline-block;
+                padding: 6px 15px;
+                border-radius: 50px;
+                background: #ffebee;
+                color: #ef4444;
+                font-size: 12px;
+                margin-bottom: 20px;
+            }
+
+            .camera-wrapper {
+                position: relative;
+                width: 100%;
+                aspect-ratio: 3/4;
+                background: #000;
+                border-radius: 15px;
+                overflow: hidden;
+                margin-bottom: 25px;
+            }
+
+            video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transform: scaleX(-1);
+            }
+            canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .btn-absen {
+                width: 100%;
+                padding: 15px;
+                border-radius: 12px;
+                border: none;
+                background: #94a3b8;
+                color: white;
+                font-weight: 700;
+                cursor: not-allowed;
+                transition: 0.3s;
+                text-transform: uppercase;
+            }
+
+            .btn-absen.active {
+                background: #4481eb;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(68, 129, 235, 0.3);
+            }
+
+            /* Responsive HP */
+            .rekap-section {
+                width: 100%;
+                max-width: 400px;
+                background: #fff;
+                padding: 15px;
+                border-radius: 20px;
+            }
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                min-width: 300px;
+            }
+            th,
+            td {
+                padding: 12px 8px;
+                font-size: 13px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+
+            @media (max-width: 768px) {
+                .sidebar {
+                    left: -260px;
+                }
+
+                .sidebar.show {
+                    left: 0;
+                }
+                .main-content {
+                    margin-left: 0;
+                    width: 100%;
+                }
+                .navbar {
+                    width: 100%;
+                    left: 0;
+                    padding: 0 15px;
+                    z-index: 999;
+                }
+                .navbar .menu_icon {
+                    display: block;
+                }
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+                .container {
+                    padding: 90px 20px 20px 20px;
+                }
+            }
+        </style>
+            </head>
+            <body>
+                <div class="absensi-container">
+                    <div id="statusLokasi" class="status-badge" style="display:block; margin-bottom:10px; background:#fff3cd; color:#856404">
+                        <span>⌛ Mengecek GPS...</span>
+                    </div>
+                    <div id="statusAi" class="status-badge">⌛ Memuat Model AI...</div>
+
+                    <div class="camera-wrapper">
+                        <video id="webcam" autoplay playsinline muted></video>
+                        <canvas id="overlay"></canvas>
+                    </div>
+
+                    <button id="btnAction" class="btn-absen" disabled>Ambil Foto & Absen</button>
+                    <p style="font-size: 12px; color: #707070; margin-top: 15px">
+                        Pastikan wajah terlihat jelas di area kamera.
+                    </p>
+                </div>
+
+                    <script>
+                        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                        if (!user || user.role !== 'guru') {
+                            window.location.href = '../login.html';
+                        }
+                        const loggedInNip = user.nip || '';
+
+                        let savedDescriptor = null;
+                        let currentUserName = '';
+                        let modelsLoaded = false;
+                        let faceMatchConfirmed = false;
+                        let lastKoordinat = null;
+
+                        let jenisAbsen = '';
+                        function getJenisAbsen() {
+                            const jam = new Date().getHours();
+                            if (jam >= 6 && jam < 12) {
+                                return 'masuk';
+                            } else if (jam >= 13 && jam < 21) {
+                                return 'pulang';
+                            }
+                            return null;
+                        }
+
+                        const statusLokasi = document.getElementById('statusLokasi');
+                        const statusText = document.getElementById('statusAi');
+                        const btnAbsen = document.getElementById('btnAction');
+                        const video = document.getElementById('webcam');
+                        const canvas = document.getElementById('overlay');
+
+                        async function setupAbsensi() {
+                        statusText.innerText = '⌛ Memuat Model AI...';
+
+                        try {
+                            await Promise.all([
+                                faceapi.nets.tinyFaceDetector.loadFromUri('https://hadirlysman14surabaya.my.id/models'),
+                                faceapi.nets.faceLandmark68Net.loadFromUri('https://hadirlysman14surabaya.my.id/models'),
+                                faceapi.nets.faceRecognitionNet.loadFromUri('https://hadirlysman14surabaya.my.id/models'),
+                            ]);
+
+                            const stream = await navigator.mediaDevices.getUserMedia({
+                                video: { facingMode: 'user' },
+                            });
+
+                            video.srcObject = stream;
+                            await video.play();
+
+                            await loadFaceFromDatabase();
+
+                        } catch (err) {
+                            statusText.innerText = '❌ Gagal: ' + err.message;
+                            console.error(err);
+                        }
+                    }
+                        async function loadFaceFromDatabase() {
+                        if (!loggedInNip) {
+                            statusText.innerText = '❌ Login tidak ditemukan';
+                            return;
+                        }
+
+                        try {
+                            const res = await fetch(`https://hadirly-backend.vercel.app/api/get-face-guru/${loggedInNip}`);
+                            const result = await res.json();
+
+                            if (result.success && result.face_vector) {
+                                const vectorData = JSON.parse(result.face_vector);
+                                savedDescriptor = new Float32Array(Object.values(vectorData));
+                                currentUserName = result.nama_lengkap;
+                                modelsLoaded = true;
+
+                                statusText.innerText = '✅ AI Siap - Arahkan Wajah';
+                                statusText.style.background = '#e8f5e9';
+                                statusText.style.color = '#28a745';
+
+                            } else {
+                                statusText.innerText = '❌ Wajah belum terdaftar';
+                            }
+
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+                        video.addEventListener('loadedmetadata', () => {
+                            faceapi.matchDimensions(canvas, {
+                                width: video.videoWidth,
+                                height: video.videoHeight,
+                            });
+                            startDetection();
+                        });
+
+                        function startDetection() {
+                        setInterval(async () => {
+                            if (!modelsLoaded || !savedDescriptor) return;
+
+                            const displaySize = {
+                                width: video.videoWidth,
+                                height: video.videoHeight,
+                            };
+
+                            faceapi.matchDimensions(canvas, displaySize);
+                            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+                            const detections = await faceapi
+                                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                                .withFaceLandmarks()
+                                .withFaceDescriptor();
+
+                            if (detections) {
+                                faceapi.draw.drawDetections(
+                                    canvas,
+                                    faceapi.resizeResults(detections, displaySize)
+                                );
+
+                                const distance = faceapi.euclideanDistance(
+                                    detections.descriptor,
+                                    savedDescriptor
+                                );
+
+                                if (distance < 0.5) {
+                                    faceMatchConfirmed = true;
+
+                                    statusText.innerText = `✅ Wajah Cocok: ${currentUserName}`;
+                                    statusText.style.background = '#e8f5e9';
+                                    statusText.style.color = '#28a745';
+
+                                    btnAbsen.disabled = false;
+                                    btnAbsen.classList.add('active');
+                                    btnAbsen.innerText = 'AMBIL FOTO & ABSEN';
+
+                                } else {
+                                    faceMatchConfirmed = false;
+
+                                    statusText.innerText = '❌ Wajah tidak cocok';
+                                    statusText.style.background = '#ffebee';
+                                    statusText.style.color = '#ef4444';
+
+                                    btnAbsen.disabled = true;
+                                    btnAbsen.classList.remove('active');
+                                }
+
+                            } else {
+                                faceMatchConfirmed = false;
+
+                                statusText.innerText = '👤 Tidak ada wajah';
+                                statusText.style.background = '#fff3e0';
+                                statusText.style.color = '#e65100';
+
+                                btnAbsen.disabled = true;
+                                btnAbsen.classList.remove('active');
+                            }
+                        }, 500);
+                    }
+
+                        // ABSEN 
+                        btnAbsen.addEventListener('click', async () => {
+
+                        if (!faceMatchConfirmed) {
+                            Swal.fire('Gagal', 'Wajah belum valid', 'error');
+                            return;
+                        }
+
+                        if (!lastKoordinat) {
+                            Swal.fire('Gagal', 'Lokasi belum valid', 'error');
+                            return;
+                        }
+
+                        const jenisAbsen = getJenisAbsen();
+                        if (!jenisAbsen) {
+                            Swal.fire(
+                                'Gagal',
+                                'Belum waktu absensi',
+                                'warning'
+                            );
+                            return;
+                        }
+
+                        btnAbsen.disabled = true;
+                        btnAbsen.innerText = 'MENYIMPAN...';
+
+                        try {
+                            const res = await fetch('https://hadirly-backend.vercel.app/api/submit-absen', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                user_id: loggedInNip,
+                                nama_lengkap: user.nama || currentUserName,
+                                lokasi_gps: `${lastKoordinat.lat},${lastKoordinat.lng}`,
+                                jenis_absen: jenisAbsen
+                                }),
+                            });
+
+                            const result = await res.json();
+                            if (!result.success) throw new Error(result.error || 'Gagal');
+
+                            Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: `Absensi untuk ${currentUserName}`,
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.href = 'dashboard_guru.html';
+                        });
+                        } catch (err) {
+                            Swal.fire('Error', err.message, 'error');
+
+                            btnAbsen.disabled = false;
+                            btnAbsen.classList.add('active');
+                            btnAbsen.innerText = 'AMBIL FOTO & ABSEN';
+                        }
+                    });
+
+                        function getRealLocation() {
+                            if (!navigator.geolocation) {
+                                statusLokasi.innerText = '❌ GPS tidak didukung';
+                                return;
+                            }
+
+                        navigator.geolocation.getCurrentPosition(
+                            (pos) => {
+                                const userLat = pos.coords.latitude;
+                                const userLng = pos.coords.longitude;
+
+                                const sekolahLat = -7.3162969;
+                                const sekolahLng = 112.7252774;
+
+                                const jarak = hitungJarak(userLat, userLng, sekolahLat, sekolahLng);
+
+                                if (jarak <= 5000) {
+                                    lastKoordinat = { lat: userLat, lng: userLng };
+
+                                    statusLokasi.innerText = `✅ Lokasi Valid (${Math.round(jarak)}m)`;
+                                    statusLokasi.style.background = '#d4edda';
+
+                                } else {
+                                    lastKoordinat = null;
+
+                                    statusLokasi.innerText = `❌ Terlalu jauh (${Math.round(jarak)}m)`;
+                                    statusLokasi.style.background = '#f8d7da';
+                                }
+                            },
+                            () => {
+                                statusLokasi.innerText = '❌ Izin lokasi ditolak';
+                            }
+                        );
+                    }
+
+                        function hitungJarak(lat1, lon1, lat2, lon2) {
+                        const R = 6371e3;
+                        const φ1 = lat1 * Math.PI/180;
+                        const φ2 = lat2 * Math.PI/180;
+                        const Δφ = (lat2 - lat1) * Math.PI/180;
+                        const Δλ = (lon2 - lon1) * Math.PI/180;
+                        const a =
+                            Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                            Math.cos(φ1) * Math.cos(φ2) *
+                            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+
+                        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+                    }
+
+                    setupAbsensi();
+                    getRealLocation();
+                    </script>
+                    <script src="../../auth.js"></script>
+    </body>
+</html>

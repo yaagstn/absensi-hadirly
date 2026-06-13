@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Izin - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+            body {
+                background: #f0f2f5;
+                overflow-x: hidden;
+            }
+
+            /* --- SIDEBAR --- */
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                width: 260px;
+                background: #11101d;
+                z-index: 100;
+                transition: all 0.5s ease;
+            }
+            .sidebar.close {
+                left: -260px;
+            }
+            .sidebar .logo-details {
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                background: #f0f2f5;
+            }
+            .sidebar .logo-details img {
+                height: 35px;
+                width: auto;
+                margin-right: 12px;
+            }
+            .sidebar .logo-details .logo_name {
+                color: #134354;
+                font-size: 24px;
+                font-weight: 700;
+            }
+
+            .sidebar .nav-links {
+                padding: 20px 0;
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                height: calc(100% - 70px);
+            }
+            .sidebar .nav-links li a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                padding: 12px 20px;
+                transition: 0.4s;
+                color: #fff;
+            }
+            .sidebar .nav-links li a i {
+                min-width: 50px;
+                text-align: center;
+                font-size: 18px;
+                opacity: 0.7;
+            }
+            .sidebar .nav-links li a .link_name {
+                font-size: 15px;
+            }
+            .sidebar .nav-links li a:hover,
+            .sidebar .nav-links li a.active {
+                background: #1d1b31;
+            }
+            .sidebar .nav-links li a:hover i,
+            .sidebar .nav-links li a.active i {
+                opacity: 1;
+                color: #4481eb;
+            }
+            .sidebar .nav-links .log_out {
+                border-top: 1px solid #2c2e3e;
+                margin-top: auto;
+                margin-bottom: 20px;
+            }
+            /* Default (Desktop) → disembunyikan */
+            .menu_icon {
+                display: none;
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+            }
+
+            /* Mode HP */
+            @media (max-width: 768px) {
+                .menu_icon {
+                    display: block;
+                }
+            }
+            /* --- MAIN CONTENT --- */
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: all 0.5s ease;
+                display: flex;
+                flex-direction: column;
+            }
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            /* --- NAVBAR --- */
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 70px;
+                background: #fff;
+                position: sticky;
+                top: 0;
+                z-index: 99;
+                padding: 0 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                width: 100%;
+            }
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+             /* Sembunyikan ikon menu secara default (layar desktop) */
+            .navbar .menu_icon {
+            display: none;
+            }
+            /* Tampilkan ikon menu hanya pada layar di bawah 768px (mode HP) */
+            @media (max-width: 768px) {
+            .navbar .menu_icon {
+            display: block;
+            font-size: 22px;
+            color: #11101d;
+            cursor: pointer;
+            }
+            }
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            .school-name {
+                font-weight: 600;
+                color: #11101d;
+                border-right: 2px solid #e0e0e0;
+                padding-right: 20px;
+                white-space: nowrap;
+            }
+            .profile-details {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .profile-details img {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+            .profile-text {
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+                line-height: 1.2;
+            }
+            .admin_name {
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .role {
+                font-size: 11px;
+                color: #707070;
+            }
+            /* --- STYLE DROPDOWN HALAMAN IZIN --- */
+            .profile-dropdown {
+                position: relative;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #fff;
+                width: 180px;
+                padding: 10px 0;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                list-style: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1100;
+                border: 1px solid #f1f5f9;
+            }
+
+            .dropdown-menu.active {
+                opacity: 1;
+                visibility: visible;
+                top: 70px;
+            }
+
+            .dropdown-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 20px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+                transition: 0.2s;
+            }
+            .dropdown-menu li a:hover {
+                background: #f0f7ff;
+                color: #4481eb;
+            }
+            .dropdown-menu hr {
+                border: 0;
+                border-top: 1px solid #eee;
+                margin: 5px 0;
+            }
+
+            #navProfileImg {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+
+            /* --- CONTAINER --- */
+            .container {
+                padding: 30px;
+                flex: 1;
+                display: flex;
+                justify-content: center;
+            }
+            .form-card {
+                background: #fff;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                max-width: 700px;
+                height: fit-content;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+            .form-group label {
+                display: block;
+                font-size: 14px;
+                font-weight: 500;
+                margin-bottom: 8px;
+                color: #333;
+            }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 12px 15px;
+                border: 1.5px solid #eee;
+                border-radius: 10px;
+                font-family: inherit;
+                font-size: 14px;
+                transition: 0.3s;
+            }
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                outline: none;
+                border-color: #4481eb;
+                background: #f0f7ff;
+            }
+
+            .btn-submit {
+                background: #4481eb;
+                color: #fff;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                width: 100%;
+                transition: 0.3s;
+                font-size: 15px;
+            }
+            .btn-submit:hover {
+                background: #3569cc;
+                transform: translateY(-2px);
+            }
+
+            @media (max-width: 768px) {
+                .sidebar {
+                    left: -260px;
+                }
+                .sidebar.show {
+                    left: 0;
+                }
+                .main-content {
+                    margin-left: 0;
+                    width: 100%;
+                }
+                .navbar .menu_icon {
+                    display: block;
+                }
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+                .container {
+                    padding: 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="dashboard_siswa.html">
+                        <i class="fas fa-home"></i>
+                        <span class="link_name">Halaman Awal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="jadwal.html">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="link_name">Jadwal Mapel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="izin.html" class="active">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="link_name">Masukkan Izin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="profil.html">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="link_name">Profil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="laporan.html">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="link_name">Laporan</span>
+                    </a>
+                </li>
+                <li class="log_out">
+                    <a href="#" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link_name">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <nav class="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                    <span class="dashboard-title"><b>Masukkan Perizinan</b></span>
+                </div>
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-text">
+                            <span class="admin_name" id="nav-user-name">Memuat...</span>
+                            <span class="role" id="nav-user-role">Memuat...</span>
+                        </div>
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            alt="Profile"
+                            id="navProfileImg" />
+
+                        <ul class="dropdown-menu" id="dropdownMenu">
+                            <li>
+                                <a href="profil.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+                            <hr />
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div class="form-card">
+                    <div style="margin-bottom: 25px">
+                        <h2 style="font-weight: 600; color: #11101d">Formulir Izin / Sakit</h2>
+                        <p style="color: #707070; font-size: 13px">
+                            Silakan isi alasan ketidakhadiran Anda dengan benar.
+                        </p>
+                    </div>
+
+                    <form id="formIzin" action="/izin" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Jenis Keterangan</label>
+                            <select id="jenis_keterangan" name="jenis_keterangan" required>
+                                <option value="sakit">Sakit</option>
+                                <option value="izin">Izin (Kepentingan Keluarga)</option>
+                                <option value="dispensasi">Dispensasi (Lomba/Kegiatan)</option>
+                            </select>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px">
+                            <div class="form-group">
+                                <label>Tanggal Mulai</label>
+                                <input
+                                    type="date"
+                                    id="tanggal_mulai"
+                                    name="tanggal_mulai"
+                                    required />
+                            </div>
+                            <div class="form-group">
+                                <label>Sampai Tanggal</label>
+                                <input
+                                    type="date"
+                                    id="sampai_tanggal"
+                                    name="sampai_tanggal"
+                                    required />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Alasan / Keperluan</label>
+                            <textarea
+                                id="alasan"
+                                name="alasan"
+                                rows="4"
+                                placeholder="Contoh: Demam tinggi, perlu istirahat total berdasarkan saran dokter."
+                                required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Unggah Bukti (Foto Surat Dokter/Surat Izin)</label>
+                            <input
+                                type="file"
+                                id="bukti_file"
+                                name="bukti_file"
+                                accept=".jpg,.png,.pdf" />
+                            <small style="color: #999; font-size: 11px">
+                                Format: JPG atau PNG. Maksimal 500KB.
+                            </small>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Kirim Keterangan Izin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const btnMenu = document.querySelector('#btn_menu');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            // Sidebar
+            btnMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (window.innerWidth <= 768) sidebar.classList.toggle('show');
+                else { sidebar.classList.toggle('close'); mainContent.classList.toggle('m-0'); }
+            });
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('show') && !sidebar.contains(e.target) && e.target !== btnMenu)
+                    sidebar.classList.remove('show');
+            });
+
+            // Navbar
+            const navImg = document.getElementById('navProfileImg');
+            const navName = document.getElementById('nav-user-name');
+            const navRole = document.getElementById('nav-user-role');
+            const savedPhoto = localStorage.getItem('userPhoto');
+            if (savedPhoto && navImg) navImg.src = savedPhoto;
+            if (navName) navName.innerText = user.nama || 'Siswa';
+            if (navRole) navRole.innerText = `Siswa - ${user.id_kelas || ''}`;
+
+            // Dropdown
+            const profileDropdown = document.getElementById('profileDropdown');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (profileDropdown) profileDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle('active'); };
+            window.onclick = (e) => { if (!e.target.closest('.profile-dropdown')) dropdownMenu.classList.remove('active'); };
+
+            // Logout
+            ['logout-btn', 'logout-dropdown'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', e => {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Konfirmasi Keluar',
+                            text: 'Apakah Anda yakin ingin keluar?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#19295C',
+                            confirmButtonText: 'Ya, Keluar!',
+                            cancelButtonText: 'Batal',
+                            reverseButtons: true
+                        })
+
+                        .then(r => {
+
+                            if (r.isConfirmed) {
+                                localStorage.removeItem('currentUser');
+
+                                localStorage.removeItem('id_guru');
+                                localStorage.removeItem('id_siswa');
+                                localStorage.removeItem('id_admin');
+
+                                window.location.href = '../login.html';
+                            }
+                        });
+                    });
+                }
+            });
+
+          // Submit form izin
+const formIzin = document.getElementById('formIzin');
+
+if (formIzin) {
+    formIzin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // 1. Ambil data user dari localStorage
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+        // 2. Sesuaikan properti dengan isi localStorage kamu (Felisya Kamila)
+        const nama = user.nama || '';
+        const kelas = user.kelas || user.id_kelas || '';
+
+        console.log('USER YANG LOGIN:', user);
+        console.log('DATA YANG DIKIRIM:', {
+            nama_siswa: nama,
+            kelas: kelas
+        });
+
+        // 3. Validasi Frontend hanya untuk Nama dan Kelas (idSiswa dihapus karena API tidak butuh)
+        if (!nama || !kelas) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Data Tidak Ditemukan',
+                text: 'Nama atau kelas siswa tidak terdeteksi. Silakan login ulang.',
+                confirmButtonColor: '#19295C'
+            });
+            return;
+        }
+
+        // 4. Validasi Ukuran File Bukti
+        const fileInput = document.getElementById('bukti_file');
+        if (fileInput.files.length > 0 && fileInput.files[0].size / 1024 > 500) {
+            Swal.fire(
+                'Gagal!',
+                `Ukuran file maksimal 500KB. File kamu: ${Math.round(fileInput.files[0].size / 1024)}KB`,
+                'error'
+            );
+            return;
+        }
+
+        // 5. Bungkus data ke dalam FormData (Sesuaikan KEY-nya dengan req.body di API)
+        const formData = new FormData();
+        formData.append('nama_siswa', nama);
+        formData.append('kelas', kelas);
+        formData.append('jenis_keterangan', document.getElementById('jenis_keterangan').value);
+        formData.append('tanggal_mulai', document.getElementById('tanggal_mulai').value);
+        formData.append('sampai_tanggal', document.getElementById('sampai_tanggal').value);
+        formData.append('alasan', document.getElementById('alasan').value);
+
+        if (fileInput.files.length > 0) {
+            formData.append('bukti_file', fileInput.files[0]);
+        }
+
+        // 6. Kirim data ke API Vercel
+        try {
+            const response = await fetch('https://hadirly-backend.vercel.app/api/izin/siswa', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                Swal.fire('Berhasil!', 'Data izin berhasil dikirim!', 'success');
+                formIzin.reset();
+            } else {
+                Swal.fire('Gagal!', result.error || 'Terjadi kesalahan di server', 'error');
+            }
+        } catch (err) {
+            Swal.fire('Error!', 'Gagal terhubung ke server!', 'error');
+        }
+    });
+}
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="/auth.js"></script>
+    </body>
+</html>
