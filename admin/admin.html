@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard Absensi Modern - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+        <style>
+            html {
+                overflow-y: scroll;
+            }
+            /* --- CSS Global --- */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+            body {
+                background: #f0f2f5;
+                overflow-x: hidden;
+            }
+
+            /* --- Sidebar & Logo (DIJAMIN TIDAK BERGETAR) --- */
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                width: 260px;
+                background: #11101d;
+                z-index: 1000;
+                transition: all 0.5s ease;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar.close {
+                left: -260px;
+            }
+
+            .sidebar .logo-details {
+                height: 70px; /* Tinggi navbar dan logo harus sama */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f0f2f5;
+                width: 100%;
+            }
+
+            .sidebar .logo-details img {
+                height: 35px;
+                width: auto;
+                object-fit: contain;
+                margin-right: 12px;
+            }
+
+            .sidebar .logo-details .logo_name {
+                color: #134354;
+                font-size: 24px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+            }
+
+            .sidebar .nav-links {
+                padding: 20px 0;
+                list-style: none;
+                flex-grow: 1; /* Biar ngisi ruang sisa */
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar .nav-links li a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                padding: 12px 20px;
+                transition: all 0.4s ease;
+            }
+
+            .sidebar .nav-links li a i {
+                min-width: 50px;
+                text-align: center;
+                color: #fff;
+                font-size: 18px;
+                opacity: 0.7;
+            }
+
+            .sidebar .nav-links li a .link_name {
+                color: #fff;
+                font-size: 15px;
+            }
+
+            .sidebar .nav-links li a:hover,
+            .sidebar .nav-links li a.active {
+                background: #1d1b31;
+            }
+
+            .sidebar .nav-links li a:hover i,
+            .sidebar .nav-links li a.active i {
+                opacity: 1;
+                color: #4481eb;
+            }
+
+            .sidebar .nav-links .log_out {
+                border-top: 1px solid #2c2e3e;
+                margin-top: auto;
+                margin-bottom: 20px;
+            }
+
+            /* --- Content Layout --- */
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: all 0.5s ease;
+            }
+
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 70px;
+                background: #fff;
+                position: fixed;
+                width: calc(100% - 260px);
+                top: 0;
+                z-index: 99;
+                padding: 0 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: all 0.5s ease;
+            }
+
+            .navbar.w-100 {
+                width: 100%;
+                left: 0;
+            }
+
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+            .navbar .dashboard-title {
+                font-size: 20px; /* Samakan semua ke 20px */
+                font-weight: 700;
+                color: #11101d;
+                margin-left: 15px; /* Tambahkan margin di sini saja agar seragam di semua file */
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+            .navbar .dashboard-title {
+                font-size: 20px; /* <--- GANTI ANGKA INI (Misal: 18px atau 22px) */
+                font-weight: 700;
+                color: #11101d;
+            }
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 30px;
+            }
+            .school-name {
+                font-weight: 600;
+                border-right: 2px solid #e0e0e0;
+                padding-right: 30px;
+            }
+            .profile-details {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .profile-details img {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+            .profile-text {
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+            }
+            .admin_name {
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .role {
+                font-size: 11px;
+                color: #707070;
+            }
+            .profile-dropdown {
+                position: relative;
+                cursor: pointer;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #fff;
+                width: 180px;
+                padding: 10px 0;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                list-style: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1001;
+            }
+
+            .dropdown-menu.active {
+                opacity: 1;
+                visibility: visible;
+                top: 75px;
+            }
+
+            .dropdown-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 20px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+                transition: 0.2s;
+            }
+
+            .dropdown-menu li a:hover {
+                background: #f0f2f5;
+                color: #1a237e;
+            }
+
+            .dropdown-menu hr {
+                border: 0;
+                border-top: 1px solid #eee;
+                margin: 5px 0;
+            }
+
+            .dropdown-menu li a i {
+                font-size: 16px;
+                color: #707070;
+            }
+
+            #navProfileImg {
+                transition:
+                    transform 0.3s ease,
+                    box-shadow 0.3s ease;
+                cursor: pointer;
+            }
+
+            #navProfileImg:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 10px rgba(68, 129, 235, 0.5); /* Warna biru brand kamu */
+            }
+
+            .container {
+                padding: 100px 30px 30px 30px;
+            }
+
+            /* --- Stats & Graphs --- */
+            .dashboard-stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-top: 30px;
+            }
+            .stat-card {
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                position: relative;
+            }
+            .stat-card.guru {
+                border-right: 8px solid #ffde59;
+            }
+            .stat-card.siswa {
+                border-right: 8px solid #eb5e8e;
+            }
+            .stat-card.tendik {
+                border-right: 8px solid #84b6f4;
+            }
+            .stat-card .main-number {
+                font-size: 48px;
+                font-weight: 800;
+                text-align: center;
+                margin: 10px 0;
+            }
+            .stat-detail {
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                color: #777;
+            }
+
+            .graph-container {
+                margin-top: 40px;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+            }
+            .graph-item h3 {
+                margin-bottom: 15px;
+                font-size: 16px;
+            }
+
+            #profile-name {
+                display: inline-block;
+                min-width: 120px; /* Sesuaikan dengan rata-rata panjang nama kamu */
+                text-align: right;
+                margin-right: 10px;
+                /* Tambahkan transisi halus agar munculnya elegan */
+                transition: opacity 0.3s ease;
+            }
+
+            /* Jika kosong, biarkan dia tetap memakan ruang */
+            #profile-name:empty::before {
+                content: '\00a0'; /* Ini adalah karakter spasi kosong agar elemen tidak mengkerut */
+            }
+            /* --- Responsif HP --- */
+            @media (max-width: 768px) {
+                .sidebar {
+                    left: -260px;
+                }
+                .sidebar.show {
+                    left: 0;
+                }
+                .main-content {
+                    margin-left: 0;
+                    width: 100%;
+                }
+                .navbar {
+                    width: 100%;
+                    left: 0;
+                    padding: 0 15px;
+                }
+                .navbar .menu_icon {
+                    display: block;
+                }
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+                .container {
+                    padding: 90px 20px 20px 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="admin.html" class="active">
+                        <i class="fas fa-home"></i>
+                        <span class="link_name">Halaman Awal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="listguru.html">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="link_name">Data Guru</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datasiswa.html">
+                        <i class="fas fa-user-graduate"></i>
+                        <span class="link_name">Data Siswa</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datakelas.html">
+                        <i class="fas fa-school"></i>
+                        <span class="link_name">Data Kelas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datamapel.html">
+                        <i class="fas fa-book"></i>
+                        <span class="link_name">Data Mapel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datajadwal.html">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="link_name">Data Jadwal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="konfirmasiizin.html">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span class="link_name">Laporan Izin Guru</span>
+                    </a>
+                 </li>
+                <li>
+                    <a href="profile.html">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="link_name">Profil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="laporan.html">
+                        <i class="fas fa-file-alt"></i>
+                        <span class="link_name">Laporan</span>
+                    </a>
+                </li>
+                <li class="log_out">
+                    <a href="#" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link_name">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <nav class="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                    <span class="dashboard-title"><b>Halaman Awal</b></span>
+                </div>
+
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+                    <div class="profile-details profile-dropdown">
+                        <div class="profile-text">
+                            <span id="profile-name" class="me-2">&nbsp;</span>
+                        </div>
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            alt="Profile"
+                            id="navProfileImg" />
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="profile.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+                            <hr />
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <h1 id="welcome-text">Selamat Datang di Website Absensi!</h1>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card guru">
+                        <h3>Guru</h3>
+                        <div class="main-number" id="total-guru">0</div>
+                        <div class="stat-detail" id="detail-guru">
+                            <span>Laki-laki : 0</span>
+                            <span>Perempuan : 0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card siswa">
+                        <h3>Siswa</h3>
+                        <div class="main-number" id="total-siswa">0</div>
+                        <div class="stat-detail" id="detail-siswa">
+                            <span>Laki-laki : 0</span>
+                            <span>Perempuan : 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="graph-container">
+                    <div class="graph-item">
+                        <h3>Statistik Guru</h3>
+                        <canvas id="chartGuru"></canvas>
+                    </div>
+                    <div class="graph-item">
+                        <h3>Statistik Siswa</h3>
+                        <canvas id="chartSiswa"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+           document.addEventListener('DOMContentLoaded', function () {
+                // 1. Ambil data dari storage
+                const storedUser = localStorage.getItem('currentUser');
+                if (!storedUser) {
+                    window.location.href = '../login.html';
+                    return;
+                }
+
+                const user = JSON.parse(storedUser);
+
+                if (user.role !== 'admin') {
+                    window.location.href = '../login.html';
+                    return;
+                }
+
+                const namaUser = user.nama;
+
+                const welcomeElement = document.getElementById('welcome-text');
+                if (welcomeElement) {
+                    welcomeElement.innerText = `Halo, ${namaUser}!`;
+                }
+
+                const profileNameElement = document.getElementById('profile-name');
+                if (profileNameElement) {
+                    profileNameElement.innerText = namaUser;
+                }
+            });
+            const savedPhoto = localStorage.getItem('userPhoto');
+            if (savedPhoto) {
+                const profileImg = document.getElementById('profileImage');
+                const navImg = document.getElementById('navProfileImg');
+
+                if (profileImg) profileImg.src = savedPhoto;
+                if (navImg) navImg.src = savedPhoto;
+            }
+
+            const btnMenu = document.querySelector('#btn_menu');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const navbar = document.querySelector('.navbar');
+
+            btnMenu.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('show');
+                } else {
+                    sidebar.classList.toggle('close');
+                    mainContent.classList.toggle('m-0');
+                    navbar.classList.toggle('w-100');
+                }
+            });
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    if (
+                        !sidebar.contains(e.target) &&
+                        !btnMenu.contains(e.target) &&
+                        sidebar.classList.contains('show')
+                    ) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+
+            profileDropdown.addEventListener('click', function (e) {
+                dropdownMenu.classList.toggle('active');
+                e.stopPropagation();
+            });
+            document.addEventListener('click', function (e) {
+                if (!profileDropdown.contains(e.target)) {
+                    dropdownMenu.classList.remove('active');
+                }
+            });
+            document.getElementById('logout-dropdown').addEventListener('click', function (e) {
+                document.getElementById('logout-btn').click();
+            });
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi Keluar',
+                        text: 'Apakah Anda yakin ingin keluar dari HadirLy?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#19295C',
+                        confirmButtonText: 'Ya, Keluar!',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            localStorage.removeItem('currentUser');
+
+                            localStorage.removeItem('id_guru');
+                            localStorage.removeItem('id_siswa');
+                            localStorage.removeItem('id_admin');
+                            localStorage.removeItem('userPhoto');
+
+                            window.location.href = '../login.html';
+                        }
+                    });
+                });
+            }
+
+            async function updateStats() {
+                try {
+                    // 1. Ambil data dari server
+                    const response = await fetch('https://hadirly-backend.vercel.app/api/stats');
+                    const data = await response.json();
+
+                    // 2. Update Angka Utama di Card (sesuai ID di HTML kamu)
+                    document.getElementById('total-guru').innerText = data.guru.total;
+                    document.getElementById('total-siswa').innerText = data.siswa.total;
+
+                    // 3. Update Detail Laki-laki & Perempuan (innerHTML agar span-nya tidak hilang)
+                    document.getElementById('detail-guru').innerHTML = `
+            <span>Laki-laki : ${data.guru.laki}</span>
+            <span>Perempuan : ${data.guru.perempuan}</span>
+        `;
+                    document.getElementById('detail-siswa').innerHTML = `
+            <span>Laki-laki : ${data.siswa.laki}</span>
+            <span>Perempuan : ${data.siswa.perempuan}</span>
+        `;
+
+                    // 4. Pengaturan Grafik (Doughnut untuk Absensi & Bar untuk Statistik)
+                    const chartOptions = {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                        },
+                    };
+
+                    // --- GRAFIK GURU (Bar Chart) ---
+                    new Chart(document.getElementById('chartGuru'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Laki-laki', 'Perempuan'],
+                            datasets: [
+                                {
+                                    label: 'Jumlah Guru',
+                                    data: [data.guru.laki, data.guru.perempuan],
+                                    backgroundColor: '#ffde59',
+                                    borderRadius: 5,
+                                },
+                            ],
+                        },
+                        options: chartOptions,
+                    });
+
+                    // --- GRAFIK SISWA (Bar Chart) ---
+                    new Chart(document.getElementById('chartSiswa'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Laki-laki', 'Perempuan'],
+                            datasets: [
+                                {
+                                    label: 'Jumlah Siswa',
+                                    data: [data.siswa.laki, data.siswa.perempuan],
+                                    backgroundColor: '#eb5e8e',
+                                    borderRadius: 5,
+                                },
+                            ],
+                        },
+                        options: chartOptions,
+                    });
+                } catch (err) {
+                    console.error('Gagal memperbarui dashboard:', err);
+                }
+            }
+
+            // grafik //
+            updateStats();
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="navbar-sync.js"></script>
+    </body>
+</html>

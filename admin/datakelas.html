@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard Absensi Modern - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+        <style>
+            html {
+                overflow-y: scroll;
+            }
+            /* --- CSS Global & Sidebar --- */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+            body {
+                background: #f8fafc;
+                overflow-x: hidden;
+            }
+
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                width: 260px;
+                background: #11101d;
+                z-index: 1000;
+                transition: all 0.5s ease;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar.close {
+                left: -260px;
+            }
+
+            .sidebar .logo-details {
+                height: 70px; /* Tinggi navbar dan logo harus sama */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f0f2f5;
+                width: 100%;
+            }
+
+            .sidebar .logo-details img {
+                height: 35px;
+                width: auto;
+                object-fit: contain;
+                margin-right: 12px;
+            }
+
+            .sidebar .logo-details .logo_name {
+                color: #134354;
+                font-size: 24px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+            }
+
+            .sidebar .nav-links {
+                padding: 20px 0;
+                list-style: none;
+                flex-grow: 1; /* Biar ngisi ruang sisa */
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar .nav-links li a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                padding: 12px 20px;
+                transition: all 0.4s ease;
+            }
+
+            .sidebar .nav-links li a i {
+                min-width: 50px;
+                text-align: center;
+                color: #fff;
+                font-size: 18px;
+                opacity: 0.7;
+            }
+
+            .sidebar .nav-links li a .link_name {
+                color: #fff;
+                font-size: 15px;
+            }
+
+            .sidebar .nav-links li a:hover,
+            .sidebar .nav-links li a.active {
+                background: #1d1b31;
+            }
+
+            .sidebar .nav-links li a:hover i,
+            .sidebar .nav-links li a.active i {
+                opacity: 1;
+                color: #4481eb;
+            }
+
+            .sidebar .nav-links .log_out {
+                border-top: 1px solid #2c2e3e;
+                margin-top: auto;
+                margin-bottom: 20px;
+            }
+
+            /* --- Content Layout --- */
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: all 0.5s ease;
+            }
+
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 70px;
+                background: #fff;
+                position: fixed;
+                width: calc(100% - 260px);
+                top: 0;
+                z-index: 99;
+                padding: 0 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: all 0.5s ease;
+            }
+
+            .navbar.w-100 {
+                width: 100%;
+                left: 0;
+            }
+
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+            .navbar .dashboard-title {
+                font-size: 20px; /* Samakan semua ke 20px */
+                font-weight: 700;
+                color: #11101d;
+                margin-left: 15px; /* Tambahkan margin di sini saja agar seragam di semua file */
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+            .navbar .dashboard-title {
+                font-size: 20px; /* <--- GANTI ANGKA INI (Misal: 18px atau 22px) */
+                font-weight: 700;
+                color: #11101d;
+            }
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 30px;
+            }
+            .school-name {
+                font-weight: 600;
+                border-right: 2px solid #e0e0e0;
+                padding-right: 30px;
+            }
+            .profile-details {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .profile-details img {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+            .profile-text {
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+            }
+            .admin_name {
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .role {
+                font-size: 11px;
+                color: #707070;
+            }
+
+            .profile-dropdown {
+                position: relative;
+                cursor: pointer;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #fff;
+                width: 180px;
+                padding: 10px 0;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                list-style: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1001;
+            }
+
+            .dropdown-menu.active {
+                opacity: 1;
+                visibility: visible;
+                top: 75px;
+            }
+
+            .dropdown-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 20px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+                transition: 0.2s;
+            }
+
+            .dropdown-menu li a:hover {
+                background: #f0f2f5;
+                color: #1a237e;
+            }
+
+            .dropdown-menu hr {
+                border: 0;
+                border-top: 1px solid #eee;
+                margin: 5px 0;
+            }
+
+            .dropdown-menu li a i {
+                font-size: 16px;
+                color: #707070;
+            }
+
+            #navProfileImg {
+                transition:
+                    transform 0.3s ease,
+                    box-shadow 0.3s ease;
+                cursor: pointer;
+            }
+
+            #navProfileImg:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 10px rgba(68, 129, 235, 0.5); /* Warna biru brand kamu */
+            }
+
+            .container {
+                padding: 100px 30px 30px 30px;
+            }
+
+            /* --- UI Table & Design --- */
+            .container {
+                padding: 100px 30px 30px 30px;
+            }
+            .card-table {
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                border: 1px solid #e2e8f0;
+                overflow: hidden;
+            }
+            .table-header {
+                padding: 20px;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            table th {
+                background: #f8fafc;
+                padding: 15px;
+                text-align: left;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #64748b;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            table td {
+                padding: 15px;
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 14px;
+                color: #334155;
+            }
+            table tr:hover {
+                background: #f1f5f9;
+            }
+
+            .badge {
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 500;
+                background: #dbeafe;
+                color: #1e40af;
+            }
+            .btn-edit {
+                background: #4f46e5;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: 500;
+                transition: 0.3s;
+                border: none;
+                cursor: pointer;
+            }
+            .btn-edit:hover {
+                background: #4338ca;
+                transform: scale(1.05);
+            }
+
+            /* --- MODAL STYLING --- */
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 2000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            .modal.active {
+                display: flex;
+            }
+            .modal-content {
+                background: #fff;
+                width: 100%;
+                max-width: 600px;
+                border-radius: 15px;
+                position: relative;
+                animation: slideDown 0.3s ease;
+            }
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-20px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            .modal-header {
+                padding: 20px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #f8fafc;
+                border-radius: 15px 15px 0 0;
+            }
+            .modal-body {
+                padding: 20px;
+            }
+            .close-modal {
+                cursor: pointer;
+                font-size: 20px;
+                color: #64748b;
+            }
+
+            .upload-box {
+                border: 2px dashed #cbd5e1;
+                padding: 20px;
+                text-align: center;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                background: #f8fafc;
+            }
+            .student-list {
+                list-style: none;
+                margin-top: 15px;
+                border: 1px solid #eee;
+                border-radius: 8px;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            .student-list li {
+                padding: 10px 15px;
+                border-bottom: 1px solid #eee;
+                font-size: 13px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            /* Paksa SweetAlert muncul di atas modal Bootstrap apa pun */
+            .swal2-container {
+                z-index: 99999 !important;
+            }
+
+            #profile-name {
+                display: inline-block;
+                min-width: 120px; 
+                text-align: right;
+                margin-right: 10px;
+                transition: opacity 0.3s ease;
+            }
+            #profile-name:empty::before {
+                content: '\00a0'; 
+            }
+            .table-container {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-bottom: 15px; 
+            }
+
+            .responsive-table {
+                width: 100%;
+                min-width: 800px; 
+                border-collapse: collapse;
+            }
+            @media (max-width: 768px) {
+                .sidebar {
+                    left: -260px;
+                }
+                .sidebar.show {
+                    left: 0;
+                }
+                .main-content {
+                    margin-left: 0;
+                    width: 100%;
+                }
+                .navbar {
+                    width: 100%;
+                    left: 0;
+                    padding: 0 15px;
+                }
+                .navbar .menu_icon {
+                    display: block;
+                }
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+                .container {
+                    padding: 90px 20px 20px 20px;
+                }
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="sidebar-overlay" id="overlay"></div>
+
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="admin.html">
+                        <i class="fas fa-home"></i>
+                        <span class="link_name">Halaman Awal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="listguru.html">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="link_name">Data Guru</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datasiswa.html">
+                        <i class="fas fa-user-graduate"></i>
+                        <span class="link_name">Data Siswa</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datakelas.html" class="active">
+                        <i class="fas fa-school"></i>
+                        <span class="link_name">Data Kelas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datamapel.html">
+                        <i class="fas fa-book"></i>
+                        <span class="link_name">Data Mapel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datajadwal.html">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="link_name">Data Jadwal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="konfirmasiizin.html">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span class="link_name">Laporan Izin Guru</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="profile.html">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="link_name">Profil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="laporan.html">
+                        <i class="fas fa-file-alt"></i>
+                        <span class="link_name">Laporan</span>
+                    </a>
+                </li>
+                <li class="log_out">
+                    <a href="#" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link_name">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <nav class="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                    <span class="dashboard-title"><b>Manajemen Kelas</b></span>
+                </div>
+
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+                    <div class="profile-details profile-dropdown">
+                        <div class="profile-text">
+                            <span id="profile-name" class="me-2"></span>
+                        </div>
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            alt="Profile"
+                            id="navProfileImg" />
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="profile.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+                            <hr />
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <h1>Daftar Kelas</h1>
+                <p style="color: #64748b; margin-bottom: 20px">
+                    Kelola data siswa per kelas di bawah ini.
+                </p>
+
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 20px">
+                    <button
+                        class="btn-edit"
+                        style="background: #10b981"
+                        onclick="openAddClassModal()">
+                        <i class="fas fa-plus-circle"></i>
+                        Tambah Kelas Baru
+                    </button>
+                </div>
+
+                <div class="card-table">
+                <div class="table-header">
+                    <span style="font-weight: 600">Data Kelas Aktif</span>
+                </div>
+                <div class="table-container">
+                    <table id="tableKelas" class="responsive-table">
+                        <thead>
+                            <tr>
+                                <th>Kelas</th>
+                                <th>Kapasitas</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                </tr>
+                        </tbody>
+                    </table>
+                </div> 
+            </div>
+
+        <div class="modal" id="studentModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Ubah Siswa Kelas</h3>
+                    <i class="fas fa-times close-modal" onclick="closeModal()"></i>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-box">
+                    <i class="fas fa-file-excel" style="font-size: 30px; color: #10b981; margin-bottom: 10px"></i>
+                    <p>Impor data banyak sekaligus lewat Spreadsheet (.xlsx / .csv)</p>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-size: 13px; color: #6b7280;">Belum punya dokumen-nya? </span>
+                        <a href="/contoh_excel.xlsx" download 
+                        style="color: #4f46e5; font-weight: bold; font-size: 13px; text-decoration: none;">
+                        Download Contoh Dokumen di sini
+                        </a>
+                    </div>
+
+                    <label style="color: #4f46e5; cursor: pointer; font-weight: 600">
+                        Klik untuk pilih dokumen
+                        <input type="file" id="uploadExcel" accept=".xlsx, .xls, .csv" style="display: none" />
+                    </label>
+                </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center">
+                        <h4 style="font-size: 14px">Daftar Siswa Saat Ini</h4>
+                        <a
+                            href="datasiswa.html"
+                            style="
+                                color: #4f46e5;
+                                font-size: 13px;
+                                font-weight: 600;
+                                text-decoration: none;
+                            ">
+                            <i class="fas fa-plus"></i>
+                            Masukkan Manual
+                        </a>
+                    </div>
+                    <ul class="student-list"></ul>
+                    <div style="margin-top: 20px; display: flex; justify-content: flex-end">
+                        <button class="btn-edit" style="background: #10b981" onclick="closeModal()">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="addClassModal">
+            <div class="modal-content" style="max-width: 400px">
+                <div class="modal-header">
+                    <h3>Tambah Kelas Baru</h3>
+                    <i class="fas fa-times close-modal" onclick="closeAddClassModal()"></i>
+                </div>
+                <div class="modal-body">
+                    <div style="display: flex; flex-direction: column; margin-bottom: 15px">
+                        <label style="font-size: 14px; font-weight: 600; margin-bottom: 8px">
+                            Nama Kelas
+                        </label>
+                        <input
+                            type="text"
+                            id="newClassName"
+                            placeholder="Contoh: XI - 1"
+                            style="padding: 10px; border: 1px solid #ddd; border-radius: 6px" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; margin-bottom: 20px">
+                        <label style="font-size: 14px; font-weight: 600; margin-bottom: 8px">
+                            Kapasitas Siswa
+                        </label>
+                        <input
+                            type="number"
+                            id="newClassCap"
+                            placeholder="Contoh: 36"
+                            style="padding: 10px; border: 1px solid #ddd; border-radius: 6px" />
+                    </div>
+                    <div style="display: flex; justify-content: flex-end">
+                        <button
+                            class="btn-edit"
+                            style="background: #10b981"
+                            onclick="saveNewClass()"
+                            data-bs-dismiss="modal">
+                            Simpan Kelas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <script>
+            const savedPhoto = localStorage.getItem('userPhoto');
+            if (savedPhoto) {
+                const profileImg = document.getElementById('profileImage');
+                const navImg = document.getElementById('navProfileImg');
+
+                if (profileImg) profileImg.src = savedPhoto;
+                if (navImg) navImg.src = savedPhoto;
+            }
+
+            
+            const overlay = document.querySelector('#overlay');
+            const studentModal = document.querySelector('#studentModal');
+            const addClassModal = document.querySelector('#addClassModal');
+            
+
+            // --- LOGIKA SIDEBAR ---
+            const btnMenu = document.querySelector('#btn_menu');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const navbar = document.querySelector('.navbar');
+
+            btnMenu.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('show');
+                } else {
+                    sidebar.classList.toggle('close');
+                    mainContent.classList.toggle('m-0');
+                    navbar.classList.toggle('w-100');
+                }
+            });
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    if (
+                        !sidebar.contains(e.target) &&
+                        !btnMenu.contains(e.target) &&
+                        sidebar.classList.contains('show')
+                    ) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const user =
+                    JSON.parse(localStorage.getItem('currentUser')) ||
+                    JSON.parse(localStorage.getItem('userLoggedIn'));
+
+                const profileName = document.getElementById('profile-name');
+                if (profileName) {
+                    const nama =
+                        user?.nama ||
+                        user?.nama_lengkap ||
+                        user?.username ||
+                        'Guest';
+
+                    profileName.innerText = nama;
+                }
+            });
+
+            // --- FUNGSI MODAL (WAJIB ADA AGAR TOMBOL BISA DIPENCET) ---
+            function openAddClassModal() {
+                addClassModal.classList.add('active');
+            }
+
+            function closeAddClassModal() {
+                addClassModal.classList.remove('active');
+            }
+
+            function closeModal() {
+                studentModal.classList.remove('active');
+            }
+
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+
+            profileDropdown.addEventListener('click', function (e) {
+                dropdownMenu.classList.toggle('active');
+                e.stopPropagation();
+            });
+            document.addEventListener('click', function (e) {
+                if (!profileDropdown.contains(e.target)) {
+                    dropdownMenu.classList.remove('active');
+                }
+            });
+
+
+            function logout() {
+                Swal.fire({
+                    title: 'Konfirmasi Keluar',
+                    text: 'Apakah Anda yakin ingin keluar dari HadirLy?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#19295C',
+                    confirmButtonText: 'Ya, Keluar!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('currentUser');
+                        localStorage.removeItem('id_guru');
+                        localStorage.removeItem('id_siswa');
+                        localStorage.removeItem('id_admin');
+                        localStorage.removeItem('userPhoto');
+
+                        window.location.href = '../login.html';
+                    }
+                });
+            }
+            // sidebar logout
+            document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+
+            // dropdown logout
+            document.getElementById('logout-dropdown')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+                  
+            // --- LOGIKA DATABASE ---
+
+            // 1. Fungsi Tambah Kelas ke Database
+            async function saveNewClass() {
+                const nameInput = document.getElementById('newClassName');
+                const capInput = document.getElementById('newClassCap');
+                const name = nameInput.value;
+                const capacity = capInput.value || 0;
+
+                if (!name) {
+                    return Swal.fire({
+                        icon: 'warning',
+                        title: 'Opps...',
+                        text: 'Nama kelas wajib diisi!',
+                    });
+                }
+
+                try {
+                    const response = await fetch('https://hadirly-backend.vercel.app/api/kelas', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nama_kelas: name, kapasitas: capacity }),
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        // --- PAKSA BERSIHKAN LAYAR DARI MODAL ---
+                        document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: 'Data Kelas berhasil disimpan ke HadirLy.',
+                                confirmButtonColor: '#11101d',
+                            });
+
+                            nameInput.value = '';
+                            capInput.value = '';
+                            loadTableKelas();
+                        }, 300);
+                    } else {
+                        throw new Error(result.error || 'Gagal menyimpan');
+                    }
+                } catch (err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Simpan',
+                        text: err.message,
+                        confirmButtonColor: '#d33',
+                    });
+                }
+            }
+            // 2. Fungsi Ambil Daftar Siswa Otomatis saat Klik "Edit Siswa"
+            async function openModal(className) {
+                document.getElementById('modalTitle').innerText = 'Manajemen Siswa: ' + className;
+                const studentList = document.querySelector('.student-list');
+
+                studentList.innerHTML = '<li>Memuat data siswa...</li>';
+                studentModal.classList.add('active');
+
+                try {
+                    // Gunakan encodeURIComponent agar spasi pada "XII - 4" terbaca dengan benar oleh server
+                    const response = await fetch(
+                        `https://hadirly-backend.vercel.app/api/kelas/${encodeURIComponent(className)}/siswa`
+                    );
+                    const students = await response.json();
+
+                    studentList.innerHTML = '';
+
+                    if (students.length === 0) {
+                        studentList.innerHTML = '<li>Belum ada siswa di kelas ini.</li>';
+                    } else {
+                        students.forEach((s, index) => {
+                            studentList.innerHTML += `
+                    <li>
+                        <span>${index + 1}. ${s.nama}</span> 
+                        <span style="color: #94a3b8;">NISN: ${s.nisn}</span>
+                    </li>`;
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error:', err);
+                    studentList.innerHTML = '<li>Gagal memuat data siswa.</li>';
+                }
+            }
+
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi Keluar',
+                        text: 'Apakah Anda yakin ingin keluar dari HadirLy?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#19295C',
+                        confirmButtonText: 'Ya, Keluar!',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) window.location.href = '../login.html';
+                    });
+                });
+            }
+
+            // 3. Fungsi Load Tabel Kelas saat Halaman Dibuka
+            async function loadTableKelas() {
+                try {
+                    const response = await fetch('https://hadirly-backend.vercel.app/api/kelas');
+                    const data = await response.json();
+                    const tbody = document.querySelector('#tableKelas tbody');
+
+                    tbody.innerHTML = ''; // Bersihkan baris X-1 dan X-2 yang statis
+
+                    data.forEach((k) => {
+                        tbody.innerHTML += `
+                <tr>
+                    <td><b>${k.nama_kelas}</b></td>
+                    <td><span class="badge">${k.kapasitas || 0} Siswa</span></td>
+                    <td><span style="color: #10b981;"><i class="fas fa-check-circle"></i> Aktif</span></td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn-edit" onclick="openModal('${k.nama_kelas}')">
+                            <i class="fas fa-user-edit"></i> Ubah Siswa
+                        </button>
+                    </td>
+                </tr>`;
+                    });
+                } catch (err) {
+                    console.error('Gagal load tabel kelas:', err);
+                }
+            }
+            // Variable untuk menyimpan nama kelas yang sedang diedit (diambil dari modal yang terbuka)
+            let currentSelectedClass = '';
+
+            // Fungsi pendukung untuk mendapatkan nama kelas saat modal dibuka
+            const originalOpenModal = openModal;
+            openModal = async function (className) {
+                currentSelectedClass = className; // Simpan nama kelas
+                await originalOpenModal(className);
+            };
+            // WAJIB: Panggil fungsi ini agar saat web dibuka, data langsung ditarik
+            document.addEventListener('DOMContentLoaded', loadTableKelas);
+            // Logika Membaca File Excel
+            document.getElementById('uploadExcel').addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async function (e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                        if (jsonData.length === 0) {
+                            return Swal.fire(
+                                'Error',
+                                'File Excel kosong atau format salah!',
+                                'error'
+                            );
+                        }
+
+                        Swal.fire({
+                            title: 'Memproses...',
+                            text: `Mengunggah ${jsonData.length} data ke kelas ${currentSelectedClass}`,
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+
+                        const response = await fetch('https://hadirly-backend.vercel.app/api/import-siswa', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                nama_kelas: currentSelectedClass,
+                                siswa: jsonData,
+                            }),
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            Swal.fire(
+                                'Berhasil!',
+                                'Data siswa otomatis masuk ke Hadirly.',
+                                'success'
+                            );
+                            openModal(currentSelectedClass); // Refresh list di modal
+                        } else {
+                            // Tampilkan pesan error spesifik dari server jika ada
+                            throw new Error(result.error || 'Gagal simpan ke Hadirly');
+                        }
+                    } catch (err) {
+                        console.error('Detail Error:', err);
+                        Swal.fire('Gagal', err.message, 'error');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="navbar-sync.js" defer></script>
+    </body>
+</html>

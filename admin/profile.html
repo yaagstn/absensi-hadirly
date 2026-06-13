@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard Absensi Modern - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+        <style>
+            html {
+                overflow-y: scroll;
+            }
+            /* --- CSS Global --- */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
+            }
+            body {
+                background: #f0f2f5;
+                overflow-x: hidden;
+            }
+
+            /* --- Sidebar & Logo (DIJAMIN TIDAK BERGETAR) --- */
+            .sidebar {
+                position: fixed;
+                height: 100%;
+                width: 260px;
+                background: #11101d;
+                z-index: 1000;
+                transition: all 0.5s ease;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar.close {
+                left: -260px;
+            }
+
+            .sidebar .logo-details {
+                height: 70px; /* Tinggi navbar dan logo harus sama */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f0f2f5;
+                width: 100%;
+            }
+
+            .sidebar .logo-details img {
+                height: 35px;
+                width: auto;
+                object-fit: contain;
+                margin-right: 12px;
+            }
+
+            .sidebar .logo-details .logo_name {
+                color: #134354;
+                font-size: 24px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+            }
+
+            .sidebar .nav-links {
+                padding: 20px 0;
+                list-style: none;
+                flex-grow: 1; /* Biar ngisi ruang sisa */
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sidebar .nav-links li a {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                padding: 12px 20px;
+                transition: all 0.4s ease;
+            }
+
+            .sidebar .nav-links li a i {
+                min-width: 50px;
+                text-align: center;
+                color: #fff;
+                font-size: 18px;
+                opacity: 0.7;
+            }
+
+            .sidebar .nav-links li a .link_name {
+                color: #fff;
+                font-size: 15px;
+            }
+
+            .sidebar .nav-links li a:hover,
+            .sidebar .nav-links li a.active {
+                background: #1d1b31;
+            }
+
+            .sidebar .nav-links li a:hover i,
+            .sidebar .nav-links li a.active i {
+                opacity: 1;
+                color: #4481eb;
+            }
+
+            .sidebar .nav-links .log_out {
+                border-top: 1px solid #2c2e3e;
+                margin-top: auto;
+                margin-bottom: 20px;
+            }
+
+            /* --- Content Layout --- */
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: all 0.5s ease;
+            }
+
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 70px;
+                background: #fff;
+                position: fixed;
+                width: calc(100% - 260px);
+                top: 0;
+                z-index: 99;
+                padding: 0 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: all 0.5s ease;
+            }
+
+            .navbar.w-100 {
+                width: 100%;
+                left: 0;
+            }
+
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+            .navbar .dashboard-title {
+                font-size: 20px; /* Samakan semua ke 20px */
+                font-weight: 700;
+                color: #11101d;
+                margin-left: 15px; /* Tambahkan margin di sini saja agar seragam di semua file */
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .navbar .nav-left-branding {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .navbar .menu_icon {
+                font-size: 22px;
+                color: #11101d;
+                cursor: pointer;
+                display: none;
+            }
+            .navbar .dashboard-title {
+                font-size: 20px; /* <--- GANTI ANGKA INI (Misal: 18px atau 22px) */
+                font-weight: 700;
+                color: #11101d;
+            }
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 30px;
+            }
+            .school-name {
+                font-weight: 600;
+                border-right: 2px solid #e0e0e0;
+                padding-right: 30px;
+            }
+            .profile-details {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .profile-details img {
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                border: 2px solid #4481eb;
+                object-fit: cover;
+            }
+            .profile-text {
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+            }
+            .admin_name {
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .role {
+                font-size: 11px;
+                color: #707070;
+            }
+
+            .profile-dropdown {
+                position: relative;
+                cursor: pointer;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #fff;
+                width: 180px;
+                padding: 10px 0;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                list-style: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1001;
+            }
+
+            .dropdown-menu.active {
+                opacity: 1;
+                visibility: visible;
+                top: 75px;
+            }
+
+            .dropdown-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 20px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+                transition: 0.2s;
+            }
+
+            .dropdown-menu li a:hover {
+                background: #f0f2f5;
+                color: #1a237e;
+            }
+
+            .dropdown-menu hr {
+                border: 0;
+                border-top: 1px solid #eee;
+                margin: 5px 0;
+            }
+
+            .dropdown-menu li a i {
+                font-size: 16px;
+                color: #707070;
+            }
+
+            #navProfileImg {
+                transition:
+                    transform 0.3s ease,
+                    box-shadow 0.3s ease;
+                cursor: pointer;
+            }
+
+            #navProfileImg:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 10px rgba(68, 129, 235, 0.5); /* Warna biru brand kamu */
+            }
+
+            .container {
+                width: 100%;
+                max-width: 1200px;
+                padding: 85px 20px 40px; /* Tambahkan padding bawah 40px */
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                /* Jangan kasih overflow: hidden di sini */
+            }
+
+            /* Update Profile Card agar lebarnya maksimal */
+            .profile-card {
+                background: #fff;
+                width: 100%; /* Mengikuti lebar container */
+                max-width: 1000px; /* Batas maksimal agar tidak terlalu gepeng di monitor lebar */
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+                margin-bottom: 25px;
+            }
+
+            .card-table {
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                border: 1px solid #e2e8f0;
+                overflow: hidden;
+                width: 100%;
+                max-width: 1000px; /* Batasi lebar maksimal agar tidak terlalu lebar di layar PC */
+            }
+            .profile-banner {
+                height: 140px;
+                background: linear-gradient(135deg, #4481eb 0%, #04befe 100%);
+            }
+            .profile-content {
+                padding: 0 20px 30px;
+                margin-top: -60px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .profile-img-container {
+                position: relative;
+                width: 120px;
+                height: 120px;
+                margin-bottom: 15px;
+            }
+            .profile-img-container img {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                border: 5px solid #fff;
+                object-fit: cover;
+                background: #fff;
+            }
+
+            .edit-btn {
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+                background: #4481eb;
+                color: #fff;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 3px solid #fff;
+                cursor: pointer;
+                font-size: 14px;
+                z-index: 10;
+                transition: 0.3s;
+            }
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+                width: 100%;
+            }
+            .info-item {
+                background: #fff;
+                padding: 20px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+            }
+            .info-item i {
+                width: 45px;
+                height: 45px;
+                background: #f0f7ff;
+                color: #4481eb;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+            }
+            .info-text label {
+                display: block;
+                font-size: 11px;
+                color: #aaa;
+                margin-bottom: 2px;
+            }
+            .info-text span {
+                font-weight: 600;
+                font-size: 14px;
+                color: #333;
+            }
+
+            .btn-save {
+                width: 100%;
+                background: #11101d;
+                color: white;
+                padding: 12px;
+                border: none;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            .btn-password {
+                width: 100%;
+                margin-top: 20px;
+                background: transparent;
+                border: 2px solid #4481eb;
+                color: #4481eb;
+                padding: 12px;
+                border-radius: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                transition: 0.3s;
+            }
+            .btn-edit-main {
+                background: #4481eb;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 8px;
+                font-size: 13px;
+                cursor: pointer;
+            }
+
+            .edit-input {
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 5px 10px;
+                width: 100%;
+                outline: none;
+            }
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+            .modal-content {
+                background: white;
+                padding: 25px;
+                border-radius: 20px;
+                text-align: center;
+                width: 90%;
+                max-width: 400px;
+            }
+            .btn-confirm {
+                background: #11101d;
+                color: white;
+                border: none;
+                padding: 10px;
+                width: 100%;
+                border-radius: 8px;
+                margin-top: 15px;
+                cursor: pointer;
+            }
+
+            .main-content {
+                margin-left: 260px; /* Sesuaikan dengan lebar sidebar kamu */
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+                transition: all 0.5s ease;
+            }
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                min-height: 100vh;
+                transition: all 0.5s ease;
+                background: #f8fafc;
+            }
+
+            /* Saat sidebar ditutup (class .m-0 dipanggil di JS kamu) */
+            .main-content.m-0 {
+                margin-left: 0;
+                width: 100%;
+            }
+            body {
+                background: #f0f2f5;
+                overflow-x: hidden;
+                /* Ganti height: 100% menjadi min-height agar bisa discroll ke bawah */
+                min-height: 100vh;
+                display: block; /* Pastikan tidak terjebak flex yang mematikan scroll */
+            }
+
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                /* Gunakan min-height agar container bisa memanjang ke bawah saat di HP */
+                min-height: 100vh;
+                transition: all 0.5s ease;
+                padding-bottom: 50px; /* Tambahkan padding bawah agar card paling bawah tidak mepet */
+            }
+
+            /* Cari dan pastikan bagian ini di style kamu */
+
+            @media (max-width: 768px) {
+                /* Layout Dasar */
+                .sidebar {
+                    left: -260px;
+                }
+                .sidebar.show {
+                    left: 0;
+                }
+                .main-content {
+                    margin-left: 0;
+                    width: 100%;
+                    min-height: 100vh;
+                }
+                .navbar {
+                    width: 100%;
+                    left: 0;
+                    padding: 0 15px;
+                }
+                .navbar .menu_icon {
+                    display: block;
+                }
+                .school-name,
+                .profile-text {
+                    display: none;
+                }
+
+                /* Jarak Container agar tidak menempel Navbar */
+                .container {
+                    padding: 90px 15px 40px 15px; /* Tambah padding bawah agar tidak kepotong */
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                /* Perbaikan agar Card tidak terpotong */
+                .profile-card {
+                    width: 100%;
+                    max-width: 100%;
+                    margin-bottom: 20px;
+                    overflow: visible; /* Mengizinkan shadow dan konten bawah muncul */
+                }
+
+                /* Grid Info: Ini yang paling penting agar konten ke bawah */
+                .info-grid {
+                    grid-template-columns: 1fr; /* Paksa jadi 1 kolom di HP */
+                    gap: 15px;
+                    width: 100%;
+                }
+
+                .info-item {
+                    padding: 15px; /* Sedikit lebih kecil agar hemat ruang */
+                }
+
+                /* Tombol Ganti Password agar lebih enak ditekan di HP */
+                .btn-password {
+                    margin-top: 15px;
+                    padding: 15px;
+                }
+            }
+            #profile-name {
+                display: inline-block;
+                min-width: 120px; /* Sesuaikan dengan rata-rata panjang nama kamu */
+                text-align: right;
+                margin-right: 10px;
+                /* Tambahkan transisi halus agar munculnya elegan */
+                transition: opacity 0.3s ease;
+            }
+
+            /* Jika kosong, biarkan dia tetap memakan ruang */
+            #profile-name:empty::before {
+                content: '\00a0'; /* Ini adalah karakter spasi kosong agar elemen tidak mengkerut */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="admin.html">
+                        <i class="fas fa-home"></i>
+                        <span class="link_name">Halaman Awal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="listguru.html">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="link_name">Data Guru</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datasiswa.html">
+                        <i class="fas fa-user-graduate"></i>
+                        <span class="link_name">Data Siswa</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datakelas.html">
+                        <i class="fas fa-school"></i>
+                        <span class="link_name">Data Kelas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datamapel.html">
+                        <i class="fas fa-book"></i>
+                        <span class="link_name">Data Mapel</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="datajadwal.html">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="link_name">Data Jadwal</span>
+                    </a>
+                </li>
+                 <li>
+                    <a href="konfirmasiizin.html">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span class="link_name">Laporan Izin Guru</span>
+                    </a>
+                 </li>
+                <li>
+                    <a href="profile.html" class="active">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="link_name">Profil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="laporan.html">
+                        <i class="fas fa-file-alt"></i>
+                        <span class="link_name">Laporan</span>
+                    </a>
+                </li>
+                <li class="log_out">
+                    <a href="#" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link_name">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <nav class="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                    <span class="dashboard-title"><b>Profil</b></span>
+                </div>
+
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+                    <div class="profile-details profile-dropdown">
+                        <div class="profile-text">
+                            <span id="profile-name" class="me-2"></span>
+                        </div>
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            alt="Profile"
+                            id="navProfileImg" />
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="profile.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+                            <hr />
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div
+                    style="
+                        width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+                        margin-bottom: 15px;
+                    ">
+                    <button id="editToggleBtn" class="btn-edit-main">
+                        <i class="fas fa-user-edit"></i>
+                        Ubah Profil
+                    </button>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-banner"></div>
+                    <div class="profile-content">
+                        <div class="profile-img-container">
+                            <img
+                                id="profileImage"
+                                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                alt="Profile" />
+                            <input
+                                type="file"
+                                id="imageUpload"
+                                accept="image/*"
+                                style="display: none" />
+                            <div
+                                class="edit-btn"
+                                onclick="document.getElementById('imageUpload').click()">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+
+                        <div class="user-info">
+                            <h2 id="displayName">Memuat...</h2>
+                            <p>Pengelola Sistem</p>
+                            <div style="margin-top: 15px">
+                                <span
+                                    style="
+                                        background: #e8f5e9;
+                                        color: #2e7d32;
+                                        padding: 5px 15px;
+                                        border-radius: 20px;
+                                        font-size: 12px;
+                                        font-weight: 600;
+                                    ">
+                                    ID Admin: ADM-2024001
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="info-text">
+                            <label>Level Akses</label>
+                            <span style="color: #666">Admin</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="info-text">
+                            <label>Terdaftar Sejak</label>
+                            <span style="color: #666">01 Januari 2024</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div class="info-text">
+                            <label>Email Admin</label>
+                            <span class="view-mode" id="viewEmail">admin@hadirly.com</span>
+                            <input
+                                type="email"
+                                id="editEmail"
+                                class="edit-mode edit-input"
+                                value="admin@hadirly.com"
+                                style="display: none" />
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <div class="info-text">
+                            <label>Nama Pengguna</label>
+                            <span class="view-mode" id="viewUsername">admin</span>
+                            <input
+                                type="text"
+                                id="editUsername"
+                                class="edit-mode edit-input"
+                                value="admin"
+                                style="display: none" />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="saveContainer" style="display: none; width: 100%; margin-top: 20px">
+                    <button class="btn-save" id="saveProfile">
+                        <i class="fas fa-save"></i>
+                        Simpan Perubahan
+                    </button>
+                </div>
+
+                <div style="width: 100%; margin-top: 30px; margin-bottom: 20px">
+                    <button id="resetPasswordBtn" class="btn-password" style="width: 100%">
+                        <i class="fas fa-key"></i>
+                        Atur Ulang Kata Sandi
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="uploadModal" class="modal-overlay">
+            <div class="modal-content">
+                <h3>Sesuaikan Foto Profil</h3>
+                <div id="croppie-container" style="margin-top: 15px"></div>
+                <button class="btn-confirm" id="confirmUpload">Potong & Simpan</button>
+                <button
+                    onclick="document.getElementById('uploadModal').style.display = 'none'"
+                    style="
+                        background: none;
+                        border: none;
+                        color: gray;
+                        margin-top: 10px;
+                        cursor: pointer;
+                    ">
+                    Batal
+                </button>
+            </div>
+        </div>
+
+        <script>
+            // --- 1. KONFIGURASI & VARIABEL AWAL ---
+            const defaultAvatar = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+            let croppieInstance = null;
+
+            // Element Selector
+            const profileImage = document.getElementById('profileImage');
+            const navProfileImg = document.getElementById('navProfileImg');
+            const imageUpload = document.getElementById('imageUpload');
+            const uploadModal = document.getElementById('uploadModal');
+            const editToggleBtn = document.getElementById('editToggleBtn');
+            const saveContainer = document.getElementById('saveContainer');
+            const viewModes = document.querySelectorAll('.view-mode');
+            const editModes = document.querySelectorAll('.edit-mode');
+
+            // --- 2. LOGIKA SIDEBAR & NAVBAR ---
+            const btnMenu = document.querySelector('#btn_menu');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const navbar = document.querySelector('.navbar');
+
+            btnMenu.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('show');
+                } else {
+                    sidebar.classList.toggle('close');
+                    mainContent.classList.toggle('m-0');
+                    navbar.classList.toggle('w-100');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    if (
+                        !sidebar.contains(e.target) &&
+                        !btnMenu.contains(e.target) &&
+                        sidebar.classList.contains('show')
+                    ) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+
+            // Dropdown Profile
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+
+            profileDropdown.addEventListener('click', (e) => {
+                dropdownMenu.classList.toggle('active');
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!profileDropdown.contains(e.target)) {
+                    dropdownMenu.classList.remove('active');
+                }
+            });
+
+            // --- 3. LOAD FOTO PROFIL DARI LOCALSTORAGE ---
+            function loadSavedPhoto() {
+                const savedPhoto = localStorage.getItem('userPhoto');
+
+                if (savedPhoto) {
+                    if (profileImage) profileImage.src = savedPhoto;
+                    if (navProfileImg) navProfileImg.src = savedPhoto;
+                } else {
+                    if (profileImage) profileImage.src = defaultAvatar;
+                    if (navProfileImg) navProfileImg.src = defaultAvatar;
+                }
+            }
+
+            // --- 4. LOAD DATA ADMIN ---
+            async function loadDataAdmin() {
+                const storedUser = localStorage.getItem('currentUser');
+                if (!storedUser) {
+                    window.location.href = '../login.html';
+                    return;
+                }
+
+                const user = JSON.parse(storedUser);
+
+                if (user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+                }
+
+                // Tampilkan data lokal dulu supaya tidak kosong saat refresh
+                const localName = user.username || user.nama || 'Admin';
+                const localEmail = user.email || 'admin@hadirly.com';
+
+                document.getElementById('displayName').innerText = localName;
+
+                const navName = document.getElementById('profile-name');
+                if (navName) {
+                    navName.innerText = localName;
+                    navName.style.color = '#11101d';
+                }
+
+                const viewUser = document.getElementById('viewUsername');
+                const viewEmail = document.getElementById('viewEmail');
+                const editUser = document.getElementById('editUsername');
+                const editEmail = document.getElementById('editEmail');
+
+                if (viewUser) viewUser.innerText = localName;
+                if (viewEmail) viewEmail.innerText = localEmail;
+                if (editUser) editUser.value = localName;
+                if (editEmail) editEmail.value = localEmail;
+
+                // Sinkronisasi ke server, tapi hanya update jika server mengirim data valid
+                try {
+                    const res = await fetch('https://hadirly-backend.vercel.app/api/admin/profile');
+
+                    if (!res.ok) {
+                        throw new Error('Gagal terhubung ke server');
+                    }
+
+                    const data = await res.json();
+
+                    if (data) {
+                        const serverName = data.username || localName;
+                        const serverEmail = data.email || localEmail;
+
+                        document.getElementById('displayName').innerText = serverName;
+
+                        if (navName) {
+                            navName.innerText = serverName;
+                            navName.style.color = '#11101d';
+                        }
+
+                        if (viewUser) viewUser.innerText = serverName;
+                        if (viewEmail) viewEmail.innerText = serverEmail;
+                        if (editUser) editUser.value = serverName;
+                        if (editEmail) editEmail.value = serverEmail;
+
+                        user.username = serverName;
+                        user.nama = serverName;
+                        user.email = serverEmail;
+                        localStorage.setItem('userLoggedIn', JSON.stringify(user));
+                    }
+                } catch (err) {
+                    console.error('Info: Gagal sinkronisasi data dari server, menggunakan data lokal.');
+                }
+            }
+
+            // Jalankan saat halaman selesai dimuat
+            document.addEventListener('DOMContentLoaded', () => {
+                loadSavedPhoto();
+                loadDataAdmin();
+            });
+
+            // --- 5. LOGIKA EDIT & SIMPAN PROFILE ---
+            editToggleBtn.addEventListener('click', function () {
+                const isEditing = editToggleBtn.classList.toggle('active');
+
+                if (isEditing) {
+                    editToggleBtn.innerHTML = '<i class="fas fa-times"></i> Batal';
+                    saveContainer.style.display = 'block';
+                    viewModes.forEach((el) => (el.style.display = 'none'));
+                    editModes.forEach((el) => (el.style.display = 'block'));
+                } else {
+                    editToggleBtn.innerHTML = '<i class="fas fa-user-edit"></i> Ubah Profil';
+                    saveContainer.style.display = 'none';
+                    viewModes.forEach((el) => (el.style.display = 'block'));
+                    editModes.forEach((el) => (el.style.display = 'none'));
+                }
+            });
+
+            document.getElementById('saveProfile').addEventListener('click', async () => {
+                const user = JSON.parse(localStorage.getItem('userLoggedIn') || '{}');
+                const usernameBaru = document.getElementById('editUsername').value.trim();
+                const emailBaru = document.getElementById('editEmail').value.trim();
+
+                if (!usernameBaru || !emailBaru) {
+                    Swal.fire('Lengkapi Data', 'Nama pengguna dan email tidak boleh kosong.', 'warning');
+                    return;
+                }
+
+                try {
+                    const res = await fetch('https://hadirly-backend.vercel.app/api/admin/profile', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: usernameBaru,
+                            email: emailBaru,
+                            nama_lengkap: usernameBaru,
+                            id: user.id || 1,
+                        }),
+                    });
+
+                    const result = await res.json();
+
+                    if (result.success) {
+                        Swal.fire('Tersimpan!', 'Profil Admin telah diperbarui.', 'success');
+
+                        user.username = usernameBaru;
+                        user.nama = usernameBaru;
+                        user.email = emailBaru;
+                        localStorage.setItem('userLoggedIn', JSON.stringify(user));
+
+                        const viewUser = document.getElementById('viewUsername');
+                        const viewEmail = document.getElementById('viewEmail');
+                        const displayName = document.getElementById('displayName');
+                        const navName = document.getElementById('profile-name');
+
+                        if (viewUser) viewUser.innerText = usernameBaru;
+                        if (viewEmail) viewEmail.innerText = emailBaru;
+                        if (displayName) displayName.innerText = usernameBaru;
+
+                        if (navName) {
+                            navName.innerText = usernameBaru;
+                            navName.style.color = '#11101d';
+                        }
+
+                        editToggleBtn.click();
+                    } else {
+                        Swal.fire('Gagal', result.message || 'Terjadi kesalahan saat menyimpan.', 'error');
+                    }
+                } catch (e) {
+                    Swal.fire('Error', 'Koneksi server terputus.', 'error');
+                }
+            });
+
+            // --- 6. LOGIKA FOTO (CROPPIE) ---
+            imageUpload.addEventListener('change', function () {
+                const file = this.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        uploadModal.style.display = 'flex';
+
+                        if (croppieInstance) {
+                            croppieInstance.destroy();
+                        }
+
+                        croppieInstance = new Croppie(document.getElementById('croppie-container'), {
+                            viewport: { width: 200, height: 200, type: 'circle' },
+                            boundary: { width: 300, height: 300 },
+                            showZoomer: true,
+                        });
+
+                        croppieInstance.bind({ url: e.target.result });
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('confirmUpload').addEventListener('click', function () {
+                if (!croppieInstance) return;
+
+                croppieInstance.result('base64').then(function (base64) {
+                    if (profileImage) profileImage.src = base64;
+                    if (navProfileImg) navProfileImg.src = base64;
+
+                    localStorage.setItem('userPhoto', base64);
+
+                    uploadModal.style.display = 'none';
+                    Swal.fire('Berhasil!', 'Foto profil diperbarui.', 'success');
+                });
+            });
+
+            // --- 7. LOGOUT ---
+            const logoutBtn = document.getElementById('logout-btn');
+
+            const handleLogout = (e) => {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Konfirmasi Keluar',
+                    text: 'Apakah Anda yakin ingin keluar dari HadirLy?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#19295C',
+                    confirmButtonText: 'Ya, Keluar!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                    localStorage.removeItem('currentUser');
+                                    
+                                    localStorage.removeItem('id_guru');
+                                    localStorage.removeItem('id_siswa');
+                                    localStorage.removeItem('id_admin');
+                                    localStorage.removeItem('userPhoto');
+
+                                    window.location.href = '../login.html';
+                                } 
+                });
+            };
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+
+            const logoutDropdown = document.getElementById('logout-dropdown');
+            if (logoutDropdown) {
+                logoutDropdown.addEventListener('click', handleLogout);
+            }
+
+            const resetPassBtn = document.getElementById('resetPasswordBtn');
+
+            if (resetPassBtn) {
+                resetPassBtn.addEventListener('click', function () {
+                    window.location.href = '../lupa_password.html';
+                });
+            }
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="navbar-sync.js"></script>
+    </body>
+</html>

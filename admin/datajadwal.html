@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard Absensi Modern - HadirLy</title>
+        <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+        <style>
+            html { overflow-y: scroll; }
+            * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+            body { background: #f8fafc; overflow-x: hidden; }
+
+            /* SIDEBAR */
+            .sidebar {
+                position: fixed; height: 100%; width: 260px;
+                background: #11101d; z-index: 1000;
+                transition: all 0.5s ease; display: flex; flex-direction: column;
+            }
+            .sidebar.close { left: -260px; }
+            .sidebar .logo-details {
+                height: 70px; display: flex; align-items: center;
+                justify-content: center; background: #f0f2f5; width: 100%;
+            }
+            .sidebar .logo-details img { height: 35px; width: auto; object-fit: contain; margin-right: 12px; }
+            .sidebar .logo-details .logo_name { color: #134354; font-size: 24px; font-weight: 700; white-space: nowrap; }
+            .sidebar .nav-links { padding: 20px 0; list-style: none; flex-grow: 1; display: flex; flex-direction: column; }
+            .sidebar .nav-links li a { display: flex; align-items: center; text-decoration: none; padding: 12px 20px; transition: all 0.4s ease; }
+            .sidebar .nav-links li a i { min-width: 50px; text-align: center; color: #fff; font-size: 18px; opacity: 0.7; }
+            .sidebar .nav-links li a .link_name { color: #fff; font-size: 15px; }
+            .sidebar .nav-links li a:hover, .sidebar .nav-links li a.active { background: #1d1b31; }
+            .sidebar .nav-links li a:hover i, .sidebar .nav-links li a.active i { opacity: 1; color: #4481eb; }
+            .sidebar .nav-links .log_out { border-top: 1px solid #2c2e3e; margin-top: auto; margin-bottom: 20px; }
+
+            /* MAIN */
+            .main-content { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; transition: all 0.5s ease; }
+            .main-content.m-0 { margin-left: 0; width: 100%; }
+
+            /* NAVBAR */
+            .navbar {
+                display: flex; justify-content: space-between; align-items: center;
+                height: 70px; background: #fff; position: fixed;
+                width: calc(100% - 260px); top: 0; z-index: 99;
+                padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.5s ease;
+            }
+            .navbar.w-100 { width: 100%; left: 0; }
+            .navbar .nav-left-branding { display: flex; align-items: center; gap: 15px; }
+            .navbar .menu_icon { font-size: 22px; color: #11101d; cursor: pointer; display: none; }
+            .navbar .dashboard-title { font-size: 20px; font-weight: 700; color: #11101d; }
+            .nav-right { display: flex; align-items: center; gap: 30px; }
+            .school-name { font-weight: 600; border-right: 2px solid #e0e0e0; padding-right: 30px; }
+            .profile-details { display: flex; align-items: center; gap: 12px; }
+            .profile-details img { height: 40px; width: 40px; border-radius: 50%; border: 2px solid #4481eb; object-fit: cover; }
+            .profile-text { display: flex; flex-direction: column; text-align: right; }
+            .admin_name { font-size: 14px; font-weight: 600; }
+            .profile-dropdown { position: relative; cursor: pointer; }
+            .dropdown-menu {
+                position: absolute; top: 60px; right: 0; background: #fff; width: 180px;
+                padding: 10px 0; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                list-style: none; opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 1001;
+            }
+            .dropdown-menu.active { opacity: 1; visibility: visible; top: 75px; }
+            .dropdown-menu li a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; }
+            .dropdown-menu li a:hover { background: #f0f2f5; color: #1a237e; }
+            .dropdown-menu hr { border: 0; border-top: 1px solid #eee; margin: 5px 0; }
+
+            /* CONTENT */
+            .container { padding: 90px 30px 30px; }
+            .page-header { margin-bottom: 25px; }
+            .page-header h1 { font-size: 22px; font-weight: 700; color: #11101d; }
+            .page-header p { color: #64748b; margin-top: 4px; font-size: 14px; }
+
+            /* FILTER BAR */
+            .filter-bar {
+                background: #fff; padding: 15px 20px; border-radius: 12px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px;
+                display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            }
+            .filter-bar select, .filter-bar input {
+                padding: 9px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+                font-family: 'Poppins', sans-serif; font-size: 13px; background: #f8fafc;
+                color: #334155; outline: none;
+            }
+            .filter-bar select:focus, .filter-bar input:focus { border-color: #4481eb; }
+            .btn-add {
+                margin-left: auto; background: #10b981; color: #fff; border: none;
+                padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+                cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;
+            }
+            .btn-add:hover { background: #059669; }
+
+            /* TABLE CARD */
+            .card-table {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+            .table-header {
+                padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
+                display: flex; justify-content: space-between; align-items: center;
+            }
+            .table-header span { font-weight: 600; font-size: 15px; color: #11101d; }
+            .table-header small { color: #64748b; font-size: 13px; }
+            table { width: 100%; border-collapse: collapse; }
+            table th {
+                padding: 12px 16px; font-size: 12px; font-weight: 600;
+                text-transform: uppercase; color: #64748b;
+                background: #f8fafc; border-bottom: 1px solid #e2e8f0; text-align: left;
+            }
+            table td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; }
+            table tr:last-child td { border-bottom: none; }
+            table tr:hover td { background: #f8fafc; }
+
+            .badge-hari {
+                display: inline-block; padding: 4px 12px; border-radius: 20px;
+                font-size: 12px; font-weight: 600;
+            }
+            .hari-senin    { background: #dbeafe; color: #1e40af; }
+            .hari-selasa   { background: #fce7f3; color: #9d174d; }
+            .hari-rabu     { background: #d1fae5; color: #065f46; }
+            .hari-kamis    { background: #fef3c7; color: #92400e; }
+            .hari-jumat    { background: #ede9fe; color: #5b21b6; }
+
+            .btn-act {
+                border: none; cursor: pointer; padding: 6px 14px;
+                border-radius: 6px; font-size: 12px; font-weight: 600; transition: 0.2s;
+            }
+            .btn-act:hover { opacity: 0.85; transform: scale(1.04); }
+            .btn-edit-act  { background: #eef4ff; color: #4481eb; }
+            .btn-del-act   { background: #fff1f1; color: #e53e3e; margin-left: 6px; }
+
+            /* MODAL */
+            .modal {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.55); z-index: 2000;
+                display: none; align-items: center; justify-content: center; padding: 20px;
+            }
+            .modal.active { display: flex; }
+            .modal-content {
+                background: #fff; width: 100%; max-width: 500px;
+                border-radius: 16px; animation: slideDown 0.25s ease;
+            }
+            @keyframes slideDown { from { transform: translateY(-18px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            .modal-header {
+                padding: 18px 22px; border-bottom: 1px solid #eee;
+                display: flex; justify-content: space-between; align-items: center;
+                background: #f8fafc; border-radius: 16px 16px 0 0;
+            }
+            .modal-header h3 { font-size: 16px; font-weight: 700; color: #11101d; }
+            .close-modal { cursor: pointer; font-size: 18px; color: #64748b; }
+            .close-modal:hover { color: #e53e3e; }
+            .modal-body { padding: 22px; }
+            .form-group { margin-bottom: 18px; }
+            .form-group label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+            .form-group select, .form-group input {
+                width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+                font-family: 'Poppins', sans-serif; font-size: 14px; background: #f8fafc;
+                color: #334155; outline: none; transition: border-color 0.2s;
+            }
+            .form-group select:focus, .form-group input:focus { border-color: #4481eb; background: #fff; }
+            .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+            .modal-footer {
+                padding: 14px 22px; border-top: 1px solid #eee;
+                display: flex; justify-content: flex-end; gap: 10px;
+            }
+            .btn-cancel {
+                background: #f1f5f9; color: #64748b; border: none; padding: 10px 20px;
+                border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+            }
+            .btn-save {
+                background: #4481eb; color: #fff; border: none; padding: 10px 24px;
+                border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            }
+            .btn-save:hover { background: #3366cc; }
+            .btn-save:disabled { background: #94a3b8; cursor: not-allowed; }
+
+            /* EMPTY STATE */
+            .empty-state { text-align: center; padding: 50px 20px; color: #94a3b8; }
+            .empty-state i { font-size: 48px; margin-bottom: 12px; }
+            .empty-state p { font-size: 14px; }
+
+            .card-table table {
+    min-width: 760px;
+}
+
+.card-table::-webkit-scrollbar {
+    height: 8px;
+}
+
+.card-table::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.card-table::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+}
+
+            /* RESPONSIVE */
+            @media (max-width: 768px) {
+                .navbar { width: 100%; left: 0; padding: 0 15px; }
+                .navbar .menu_icon { display: block; }
+                .school-name, .profile-text { display: none; }
+                .sidebar { left: -260px; }
+                .sidebar.show { left: 0; }
+                .main-content { margin-left: 0; width: 100%; }
+                .container { padding: 80px 15px 20px; }
+                .filter-bar { flex-direction: column; align-items: stretch; }
+                .btn-add { margin-left: 0; justify-content: center; }
+                .form-row { grid-template-columns: 1fr; }
+            }
+            .swal2-container { z-index: 9999 !important; }
+        </style>
+    </head>
+    <body>
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo-details">
+                <img src="logoku.png" alt="Logo" />
+                <span class="logo_name">HadirLy</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="admin.html"><i class="fas fa-home"></i><span class="link_name">Halaman Awal</span></a></li>
+                <li><a href="listguru.html"><i class="fas fa-chalkboard-teacher"></i><span class="link_name">Data Guru</span></a></li>
+                <li><a href="datasiswa.html"><i class="fas fa-user-graduate"></i><span class="link_name">Data Siswa</span></a></li>
+                <li><a href="datakelas.html"><i class="fas fa-school"></i><span class="link_name">Data Kelas</span></a></li>
+                <li><a href="datamapel.html"><i class="fas fa-book"></i><span class="link_name">Data Mapel</span></a></li>
+                <li><a href="datajadwal.html" class="active"><i class="fas fa-calendar-alt"></i><span class="link_name">Data Jadwal</span></a></li>
+                <li><a href="konfirmasiizin.html"><i class="fas fa-clipboard-list"></i><span class="link_name">Laporan Izin Guru</span></a></li>
+                <li><a href="profile.html"><i class="fas fa-user-circle"></i><span class="link_name">Profil</span></a></li>
+                <li><a href="laporan.html"><i class="fas fa-file-alt"></i><span class="link_name">Laporan</span></a></li>
+                <li class="log_out"><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i><span class="link_name">Keluar</span></a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <nav class="navbar">
+                <div class="nav-left-branding">
+                    <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                    <span style="margin-left: 15px; font-weight: 700; font-size: 18px">
+                        Jadwal Guru
+                    </span>
+                </div>
+                <div class="nav-right">
+                    <span class="school-name">SMAN 14 SURABAYA</span>
+                    <div class="profile-details profile-dropdown">
+                        <div class="profile-text">
+                            <span id="profile-name" class="me-2"></span>
+                        </div>
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            alt="Profile"
+                            id="navProfileImg" />
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="profile.html">
+                                    <i class="fas fa-user-edit"></i>
+                                    Ubah Profil
+                                </a>
+                            </li>
+                            <hr />
+                            <li>
+                                <a href="#" id="logout-dropdown">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div class="page-header">
+                    <h1>Data Jadwal Mengajar</h1>
+                    <p>Kelola jadwal mengajar guru per kelas dan mata pelajaran.</p>
+                </div>
+
+                <!-- FILTER + TOMBOL TAMBAH -->
+                <div class="filter-bar">
+                    <select id="filterHari">
+                        <option value="">Semua Hari</option>
+                        <option>Senin</option><option>Selasa</option><option>Rabu</option>
+                        <option>Kamis</option><option>Jumat</option>
+                    </select>
+                    <select id="filterKelas"><option value="">Semua Kelas</option></select>
+                    <select id="filterGuru"><option value="">Semua Guru</option></select>
+                    <button class="btn-add" onclick="openModal()">
+                        <i class="fas fa-plus-circle"></i> Tambah Jadwal
+                    </button>
+                </div>
+
+                <!-- TABEL -->
+                <div class="card-table">
+                    <div class="table-header">
+                        <span>Daftar Jadwal Aktif</span>
+                        <small id="countLabel">Memuat...</small>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:40px">No</th>
+                                <th>Mata Pelajaran</th>
+                                <th>Kelas</th>
+                                <th>Guru Pengampu</th>
+                                <th>Hari</th>
+                                <th>Jam</th>
+                                <th style="width:100px">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jadwalTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:#94a3b8">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL TAMBAH / EDIT -->
+        <div class="modal" id="jadwalModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Tambah Jadwal</h3>
+                    <i class="fas fa-times close-modal" onclick="closeModal()"></i>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editId" />
+                    <div class="form-group">
+                        <label>Guru Pengampu</label>
+                        <select id="formGuru"><option value="">-- Pilih Guru --</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mata Pelajaran</label>
+                        <select id="formMapel"><option value="">-- Pilih Mapel --</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas</label>
+                        <select id="formKelas"><option value="">-- Pilih Kelas --</option></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Hari</label>
+                            <select id="formHari">
+                                <option value="">-- Pilih Hari --</option>
+                                <option>Senin</option><option>Selasa</option><option>Rabu</option>
+                                <option>Kamis</option><option>Jumat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jam (contoh: 07:00 - 09:00)</label>
+                            <input type="text" id="formJam" placeholder="07:00 - 09:00" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="closeModal()">Batal</button>
+                    <button class="btn-save" id="btnSave" onclick="saveJadwal()">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="/auth.js"></script>
+        <script>
+            // ── Session & navbar ──────────────────────────────────────────
+            const _u = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!_u || _u.role !== 'admin') {
+                window.location.href = '../login.html';
+                throw new Error('Unauthorized');
+            }
+            const _pn = document.getElementById('profile-name');
+            if (_pn) _pn.textContent = _u.nama || 'Admin';
+
+            const _ph = localStorage.getItem('userPhoto');
+            if (_ph) { const ni = document.getElementById('navProfileImg'); if (ni) ni.src = _ph; }
+
+            // ── Sidebar & dropdown ────────────────────────────────────────
+            const btnMenu   = document.getElementById('btn_menu');
+            const sidebar   = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const navbar    = document.querySelector('.navbar');
+
+            btnMenu.addEventListener('click', () => {
+                if (window.innerWidth <= 768) sidebar.classList.toggle('show');
+                else {
+                    sidebar.classList.toggle('close');
+                    mainContent.classList.toggle('m-0');
+                    navbar.classList.toggle('w-100');
+                }
+            });
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !btnMenu.contains(e.target))
+                    sidebar.classList.remove('show');
+                if (!document.querySelector('.profile-dropdown').contains(e.target))
+                    document.querySelector('.dropdown-menu').classList.remove('active');
+            });
+            document.querySelector('.profile-dropdown').addEventListener('click', (e) => {
+                document.querySelector('.dropdown-menu').classList.toggle('active');
+                e.stopPropagation();
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                Swal.fire({ title:'Konfirmasi Keluar', text:'Apakah Anda yakin ingin keluar?', icon:'warning',
+                    showCancelButton:true, confirmButtonColor:'#19295C', confirmButtonText:'Ya, Keluar!', cancelButtonText: 'Batal',
+                    reverseButtons:true }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            localStorage.removeItem('currentUser');
+                            
+                            localStorage.removeItem('id_guru');
+                            localStorage.removeItem('id_siswa');
+                            localStorage.removeItem('id_admin');
+                            localStorage.removeItem('userPhoto');
+
+                            window.location.href = '../login.html';
+                        } 
+                    });
+            });
+            document.getElementById('logout-dropdown').addEventListener('click', () =>
+                document.getElementById('logout-btn').click());
+
+            // ── State ─────────────────────────────────────────────────────
+            let allJadwal = [];
+            let guruList  = [];
+            let kelasList = [];
+            let mapelList = [];
+
+            const HARI_CLASS = {
+                'Senin':'hari-senin', 'Selasa':'hari-selasa', 'Rabu':'hari-rabu',
+                'Kamis':'hari-kamis', 'Jumat':'hari-jumat'
+            };
+
+            // ── Load semua referensi data ─────────────────────────────────
+            async function loadReferensi() {
+                const [resGuru, resKelas, resMapel] = await Promise.all([
+                    fetch('https://hadirly-backend.vercel.app/api/guru/daftar').then(r => r.json()),
+                    fetch('https://hadirly-backend.vercel.app/api/kelas').then(r => r.json()),
+                    fetch('https://hadirly-backend.vercel.app/api/mapel').then(r => r.json()),
+                ]);
+
+                guruList  = Array.isArray(resGuru)  ? resGuru  : (resGuru.data  || []);
+                kelasList = Array.isArray(resKelas) ? resKelas : (resKelas.data || []);
+                mapelList = Array.isArray(resMapel) ? resMapel : (resMapel.data || []);
+
+                // Isi filter kelas & guru
+                const fKelas = document.getElementById('filterKelas');
+                const fGuru  = document.getElementById('filterGuru');
+                kelasList.forEach(k => fKelas.innerHTML += `<option value="${k.nama_kelas}">${k.nama_kelas}</option>`);
+                guruList.forEach(g  => fGuru.innerHTML  += `<option value="${g.nama_lengkap}">${g.nama_lengkap}</option>`);
+            }
+
+            // ── Isi dropdown form modal ───────────────────────────────────
+            function populateFormDropdowns() {
+                const fG = document.getElementById('formGuru');
+                const fM = document.getElementById('formMapel');
+                const fK = document.getElementById('formKelas');
+
+                fG.innerHTML = '<option value="">-- Pilih Guru --</option>';
+                fM.innerHTML = '<option value="">-- Pilih Mapel --</option>';
+                fK.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+
+                guruList.forEach(g  => fG.innerHTML += `<option value="${g.nip_id}">${g.nama_lengkap}</option>`);
+                mapelList.forEach(m => fM.innerHTML += `<option value="${m.id}">${m.nama_mapel}</option>`);
+                kelasList.forEach(k => fK.innerHTML += `<option value="${k.id}">${k.nama_kelas}</option>`);
+            }
+
+            // ── Load & render jadwal ──────────────────────────────────────
+            async function loadJadwal() {
+                const res  = await fetch('https://hadirly-backend.vercel.app/api/admin/jadwal');
+                const json = await res.json();
+                allJadwal  = json.success ? json.data : [];
+                renderTable();
+            }
+
+            function renderTable() {
+                const filterH = document.getElementById('filterHari').value;
+                const filterK = document.getElementById('filterKelas').value;
+                const filterG = document.getElementById('filterGuru').value;
+
+                const filtered = allJadwal.filter(j =>
+                    (!filterH || j.hari === filterH) &&
+                    (!filterK || j.nama_kelas === filterK) &&
+                    (!filterG || j.nama_guru === filterG)
+                );
+
+                const tbody = document.getElementById('jadwalTableBody');
+                document.getElementById('countLabel').textContent = `${filtered.length} jadwal`;
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px">
+                        <div class="empty-state"><i class="fas fa-calendar-times"></i><p>Belum ada jadwal yang sesuai filter.</p></div>
+                    </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filtered.map((j, i) => `
+                    <tr>
+                        <td style="color:#94a3b8">${i + 1}</td>
+                        <td><strong>${j.nama_mapel}</strong></td>
+                        <td>${j.nama_kelas}</td>
+                        <td>${j.nama_guru}</td>
+                        <td><span class="badge-hari ${HARI_CLASS[j.hari] || ''}">${j.hari}</span></td>
+                        <td><i class="fas fa-clock" style="color:#94a3b8;margin-right:5px"></i>${j.jam}</td>
+                        <td>
+                            <button class="btn-act btn-edit-act" onclick="openEditModal(${j.id})"><i class="fas fa-pen"></i> Edit</button>
+                            <button class="btn-act btn-del-act"  onclick="hapusJadwal(${j.id}, '${j.nama_mapel} - ${j.nama_kelas}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // ── Filter listeners ──────────────────────────────────────────
+            ['filterHari','filterKelas','filterGuru'].forEach(id =>
+                document.getElementById(id).addEventListener('change', renderTable));
+
+            // ── Modal open / close ────────────────────────────────────────
+            function openModal() {
+                document.getElementById('modalTitle').textContent = 'Tambah Jadwal';
+                document.getElementById('editId').value = '';
+                document.getElementById('formHari').value = '';
+                document.getElementById('formJam').value  = '';
+                populateFormDropdowns();
+                document.getElementById('jadwalModal').classList.add('active');
+            }
+
+            function openEditModal(id) {
+                const j = allJadwal.find(x => x.id === id);
+                if (!j) return;
+                document.getElementById('modalTitle').textContent = 'Edit Jadwal';
+                document.getElementById('editId').value = id;
+                populateFormDropdowns();
+                // Set nilai setelah dropdown terisi
+                document.getElementById('formGuru').value  = j.id_guru;
+                document.getElementById('formMapel').value = j.id_mapel;
+                document.getElementById('formKelas').value = j.id_kelas;
+                document.getElementById('formHari').value  = j.hari;
+                document.getElementById('formJam').value   = j.jam;
+                document.getElementById('jadwalModal').classList.add('active');
+            }
+
+            function closeModal() {
+                document.getElementById('jadwalModal').classList.remove('active');
+            }
+
+            // ── Save (tambah / edit) ──────────────────────────────────────
+            async function saveJadwal() {
+                const id     = document.getElementById('editId').value;
+                const id_guru  = document.getElementById('formGuru').value;
+                const id_mapel = document.getElementById('formMapel').value;
+                const id_kelas = document.getElementById('formKelas').value;
+                const hari     = document.getElementById('formHari').value;
+                const jam      = document.getElementById('formJam').value.trim();
+
+                if (!id_guru || !id_mapel || !id_kelas || !hari || !jam) {
+                    Swal.fire('Perhatian', 'Semua kolom wajib diisi.', 'warning');
+                    return;
+                }
+
+                const btn = document.getElementById('btnSave');
+                btn.disabled = true;
+
+                const url    = id ? `https://hadirly-backend.vercel.app/api/admin/jadwal/${id}` : 'https://hadirly-backend.vercel.app/api/admin/jadwal';
+                const method = id ? 'PUT' : 'POST';
+
+                try {
+                    const res  = await fetch(url, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_mapel, id_kelas, id_guru, hari, jam }),
+                    });
+                    const json = await res.json();
+
+                    if (json.success) {
+                        Swal.fire({ icon:'success', title: id ? 'Berhasil diperbarui!' : 'Jadwal ditambahkan!', timer:1500, showConfirmButton:false });
+                        closeModal();
+                        await loadJadwal();
+                    } else {
+                        Swal.fire('Gagal', json.message || json.error || 'Terjadi kesalahan.', 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Error', 'Gagal terhubung ke server.', 'error');
+                } finally {
+                    btn.disabled = false;
+                }
+            }
+
+            // ── Hapus ─────────────────────────────────────────────────────
+            async function hapusJadwal(id, label) {
+                const conf = await Swal.fire({
+                    title: 'Hapus Jadwal?',
+                    html: `Jadwal <b>${label}</b> akan dihapus permanen.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e53e3e',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                });
+                if (!conf.isConfirmed) return;
+
+                try {
+                    const res  = await fetch(`https://hadirly-backend.vercel.app/api/admin/jadwal/${id}`, { method: 'DELETE' });
+                    const json = await res.json();
+                    if (json.success) {
+                        Swal.fire({ icon:'success', title:'Dihapus!', timer:1200, showConfirmButton:false });
+                        await loadJadwal();
+                    } else {
+                        Swal.fire('Gagal', json.message || 'Terjadi kesalahan.', 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Error', 'Gagal terhubung ke server.', 'error');
+                }
+            }
+
+            // ── Init ──────────────────────────────────────────────────────
+            document.addEventListener('DOMContentLoaded', async () => {
+                await loadReferensi();
+                await loadJadwal();
+            });
+        </script>
+        <script src="navbar-sync.js"></script>
+    </body>
+</html>

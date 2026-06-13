@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laporan Izin Guru - HadirLy</title>
+    <link rel="icon" type="image/png" href="../logohadirly2.png?v=2" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            position: fixed;
+            height: 100%;
+            width: 260px;
+            background: #11101d;
+            z-index: 1000;
+            transition: all 0.5s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.close {
+            left: -260px;
+        }
+
+        .sidebar .logo-details {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f2f5;
+            width: 100%;
+        }
+
+        .sidebar .logo-details img {
+            height: 35px;
+            width: auto;
+            object-fit: contain;
+            margin-right: 12px;
+        }
+
+        .sidebar .logo-details .logo_name {
+            color: #134354;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .sidebar .nav-links {
+            padding: 20px 0;
+            list-style: none;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .nav-links li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 12px 20px;
+            transition: all 0.4s ease;
+        }
+
+        .sidebar .nav-links li a i {
+            min-width: 50px;
+            text-align: center;
+            color: #fff;
+            font-size: 18px;
+            opacity: 0.7;
+        }
+
+        .sidebar .nav-links li a .link_name {
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .sidebar .nav-links li a:hover,
+        .sidebar .nav-links li a.active {
+            background: #1d1b31;
+        }
+
+        .sidebar .nav-links li a:hover i,
+        .sidebar .nav-links li a.active i {
+            opacity: 1;
+            color: #4481eb;
+        }
+
+        .sidebar .nav-links .log_out {
+            border-top: 1px solid #2c2e3e;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+            transition: all 0.5s ease;
+        }
+
+        .main-content.m-0 {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            background: #fff;
+            position: fixed;
+            width: calc(100% - 260px);
+            top: 0;
+            z-index: 99;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.5s ease;
+        }
+
+        .navbar.w-100 {
+            width: 100%;
+            left: 0;
+        }
+
+        .nav-left-branding {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .navbar .menu_icon {
+            font-size: 22px;
+            color: #11101d;
+            cursor: pointer;
+            display: none;
+        }
+
+        .dashboard-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #11101d;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .school-name {
+            font-weight: 600;
+            border-right: 2px solid #e0e0e0;
+            padding-right: 30px;
+        }
+
+        .profile-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-details img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            border: 2px solid #4481eb;
+            object-fit: cover;
+        }
+
+        .profile-text {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        #profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .profile-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: #fff;
+            width: 180px;
+            padding: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            list-style: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            top: 75px;
+        }
+
+        .dropdown-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown-menu li a:hover {
+            background: #f0f2f5;
+            color: #1a237e;
+        }
+
+        .dropdown-menu hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 5px 0;
+        }
+
+        .container {
+            padding: 100px 30px 30px 30px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 26px;
+            color: #11101d;
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: #707070;
+            font-size: 14px;
+        }
+
+        .filter-box {
+            background: #fff;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-box input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .filter-box button,
+        .bukti-button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-filter {
+            background: #8aa9d4;
+        }
+
+        .btn-reset {
+            background: #707070;
+        }
+
+        .bukti-button {
+            background: #4481eb;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .bukti-button.pdf {
+            background: #dc3545;
+        }
+
+        .bukti-button:hover {
+            opacity: 0.9;
+        }
+
+        .table-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+        }
+
+        thead {
+            background: #64748b;
+            color: #fff;
+        }
+
+        th,
+        td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-sakit {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-izin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-dispensasi {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 35px;
+            color: #707070;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -260px;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .navbar {
+                width: 100%;
+                left: 0;
+                padding: 0 15px;
+            }
+
+            .navbar .menu_icon {
+                display: block;
+            }
+
+            .school-name,
+            .profile-text {
+                display: none;
+            }
+
+            .container {
+                padding: 90px 20px 20px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <img src="logoku.png" alt="Logo" />
+            <span class="logo_name">HadirLy</span>
+        </div>
+
+        <ul class="nav-links">
+            <li>
+                <a href="admin.html">
+                    <i class="fas fa-home"></i>
+                    <span class="link_name">Halaman Awal</span>
+                </a>
+            </li>
+            <li>
+                <a href="listguru.html">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span class="link_name">Data Guru</span>
+                </a>
+            </li>
+            <li>
+                <a href="datasiswa.html">
+                    <i class="fas fa-user-graduate"></i>
+                    <span class="link_name">Data Siswa</span>
+                </a>
+            </li>
+            <li>
+                <a href="datakelas.html">
+                    <i class="fas fa-school"></i>
+                    <span class="link_name">Data Kelas</span>
+                </a>
+            </li>
+            <li>
+                <a href="datamapel.html">
+                    <i class="fas fa-book"></i>
+                    <span class="link_name">Data Mapel</span>
+                </a>
+            </li>
+            <li>
+                <a href="datajadwal.html">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="link_name">Data Jadwal</span>
+                </a>
+            </li>
+            <li>
+                <a href="konfirmasiizin.html" class="active">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span class="link_name">Laporan Izin Guru</span>
+                </a>
+            </li>
+            <li>
+                <a href="profile.html">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="link_name">Profil</span>
+                </a>
+            </li>
+            <li>
+                <a href="laporan.html">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="link_name">Laporan</span>
+                </a>
+            </li>
+            <li class="log_out">
+                <a href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="link_name">Keluar</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <nav class="navbar">
+            <div class="nav-left-branding">
+                <i class="fas fa-bars menu_icon" id="btn_menu"></i>
+                <span class="dashboard-title">Laporan Izin Guru</span>
+            </div>
+
+            <div class="nav-right">
+                <span class="school-name">SMAN 14 SURABAYA</span>
+                <div class="profile-details profile-dropdown">
+                    <div class="profile-text">
+                        <span id="profile-name">&nbsp;</span>
+                    </div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile" id="navProfileImg" />
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="profile.html">
+                                <i class="fas fa-user-edit"></i>
+                                Ubah Profil
+                            </a>
+                        </li>
+                        <hr />
+                        <li>
+                            <a href="#" id="logout-dropdown">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Keluar
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="page-header">
+                <h1>Laporan Izin Guru</h1>
+                <p>Menampilkan data izin guru beserta bukti yang telah dikirim.</p>
+            </div>
+
+            <div class="filter-box">
+                <input type="month" id="filterBulan" />
+                <button class="btn-filter" id="btnTampilkan">
+                    <i class="fas fa-filter"></i>
+                    Tampilkan
+                </button>
+                <button class="btn-reset" id="btnReset">
+                    <i class="fas fa-sync-alt"></i>
+                    Reset
+                </button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Guru</th>
+                                <th>Jenis</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Alasan</th>
+                                <th>Bukti</th>
+                            </tr>
+                        </thead>
+                        <tbody id="laporanIzinGuruBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">Memuat laporan izin guru...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        const API_URL = 'https://hadirly-backend.vercel.app/api/admin/laporan-izin-guru';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const storedUser = localStorage.getItem('currentUser');
+
+            if (!storedUser) {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const user = JSON.parse(storedUser);
+
+            if (user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('profile-name').innerText = user.nama || 'Admin';
+
+            const savedPhoto = localStorage.getItem('userPhoto');
+            if (savedPhoto) {
+                document.getElementById('navProfileImg').src = savedPhoto;
+            }
+
+            loadLaporanIzinGuru();
+        });
+
+        const btnMenu = document.querySelector('#btn_menu');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        const navbar = document.querySelector('.navbar');
+
+        btnMenu.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('close');
+                mainContent.classList.toggle('m-0');
+                navbar.classList.toggle('w-100');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (
+                    !sidebar.contains(e.target) &&
+                    !btnMenu.contains(e.target) &&
+                    sidebar.classList.contains('show')
+                ) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+
+        const profileDropdown = document.querySelector('.profile-dropdown');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        profileDropdown.addEventListener('click', function (e) {
+            dropdownMenu.classList.toggle('active');
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', function () {
+            dropdownMenu.classList.remove('active');
+        });
+
+        document.getElementById('logout-dropdown').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('logout-btn').click();
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Konfirmasi Keluar',
+                text: 'Apakah Anda yakin ingin keluar dari HadirLy?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#19295C',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Keluar!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('id_guru');
+                    localStorage.removeItem('id_siswa');
+                    localStorage.removeItem('id_admin');
+                    localStorage.removeItem('userPhoto');
+
+                    window.location.href = '../login.html';
+                }
+            });
+        });
+
+        document.getElementById('btnTampilkan').addEventListener('click', loadLaporanIzinGuru);
+
+        document.getElementById('btnReset').addEventListener('click', function () {
+            document.getElementById('filterBulan').value = '';
+            loadLaporanIzinGuru();
+        });
+
+        async function loadLaporanIzinGuru() {
+            const tbody = document.getElementById('laporanIzinGuruBody');
+            const bulan = document.getElementById('filterBulan').value;
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-state">Memuat laporan izin guru...</td>
+                </tr>
+            `;
+
+            try {
+                let url = API_URL;
+
+                if (bulan) {
+                    url += `?bulan=${bulan}`;
+                }
+
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Gagal mengambil laporan izin guru');
+                }
+
+                const data = result.data || [];
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty-state">Tidak ada laporan izin guru.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.map((izin, index) => {
+                    return `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${izin.nama_pengajar || '-'}</td>
+                            <td>
+                                <span class="badge badge-${izin.jenis_keterangan || 'izin'}">
+                                    ${formatJenisIzin(izin.jenis_keterangan)}
+                                </span>
+                            </td>
+                            <td>${formatTanggal(izin.tanggal_mulai)}</td>
+                            <td>${formatTanggal(izin.tanggal_selesai)}</td>
+                            <td>${izin.alasan || '-'}</td>
+                            <td>${renderBuktiButton(izin)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">Gagal memuat laporan izin guru.</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderBuktiButton(izin) {
+            if (!izin.bukti_url) {
+                return 'Tidak ada';
+            }
+
+            const buktiUrl = formatBuktiUrl(izin.bukti_url);
+
+            if (isPdfFile(izin)) {
+                return `
+                    <button class="bukti-button pdf" onclick="window.open('${buktiUrl}', '_blank')">
+                        <i class="fas fa-file-pdf"></i>
+                        Lihat PDF
+                    </button>
+                `;
+            }
+
+            const encodedData = encodeURIComponent(JSON.stringify(izin));
+
+            return `
+                <button class="bukti-button" onclick="buatLaporanPdf('${encodedData}')">
+                    <i class="fas fa-file-alt"></i>
+                    Lihat Bukti
+                
+                </button>
+            `;
+        }
+
+        function isPdfFile(izin) {
+            const mimeType = (izin.bukti_mime_type || izin.mimetype || '').toLowerCase();
+            const buktiUrl = (izin.bukti_url || '').toLowerCase();
+
+            return mimeType.includes('pdf') || buktiUrl.includes('.pdf');
+        }
+
+        async function buatLaporanPdf(encodedIzin) {
+            try {
+                const izin = JSON.parse(decodeURIComponent(encodedIzin));
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+
+                const buktiUrl = formatBuktiUrl(izin.bukti_url);
+
+                Swal.fire({
+                    title: 'Membuat PDF...',
+                    text: 'Mohon tunggu sebentar.',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                const now = new Date();
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.text(
+                    now.toLocaleDateString('id-ID') + ', ' + now.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    }),
+                    20,
+                    14
+                );
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.text('Dashboard Absensi Modern - HadirLy', 105, 14, { align: 'center' });
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(15);
+                doc.text('LAPORAN IZIN GURU', 105, 24, { align: 'center' });
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.text('SMA NEGERI 14 SURABAYA', 105, 31, { align: 'center' });
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(100, 100, 100);
+                doc.text('Jl. Raya Surabaya No. 123, Jawa Timur', 105, 37, { align: 'center' });
+
+                doc.setTextColor(0, 0, 0);
+                doc.setLineWidth(0.4);
+                doc.line(20, 45, 190, 45);
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Periode: ${formatBulanPdf(izin.tanggal_mulai)}`, 190, 56, { align: 'right' });
+                doc.text(`Tanggal Cetak: ${formatTanggalSingkat(now)}`, 190, 63, { align: 'right' });
+
+                let y = 76;
+
+                /* TABEL DATA IZIN */
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text('A. Data Perizinan', 20, y);
+                y += 8;
+
+                const tableX = 20;
+                const tableY = y;
+                const labelWidth = 45;
+                const valueWidth = 125;
+                const rowHeight = 10;
+
+                const rows = [
+                    ['Nama Guru', izin.nama_pengajar || '-'],
+                    ['Jenis Keterangan', formatJenisIzin(izin.jenis_keterangan)],
+                    ['Tanggal Mulai', formatTanggal(izin.tanggal_mulai)],
+                    ['Tanggal Selesai', formatTanggal(izin.tanggal_selesai)],
+                ];
+
+                doc.setFontSize(9);
+
+                rows.forEach((row, index) => {
+                    const currentY = tableY + index * rowHeight;
+
+                    doc.setDrawColor(190, 200, 215);
+                    doc.rect(tableX, currentY, labelWidth, rowHeight);
+                    doc.rect(tableX + labelWidth, currentY, valueWidth, rowHeight);
+
+                    doc.setFillColor(245, 248, 252);
+                    doc.rect(tableX, currentY, labelWidth, rowHeight, 'F');
+
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(row[0], tableX + 3, currentY + 6.5);
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(row[1], tableX + labelWidth + 3, currentY + 6.5);
+                });
+
+                y = tableY + rows.length * rowHeight + 10;
+
+                /* ALASAN */
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text('B. Alasan / Keperluan', 20, y);
+                y += 8;
+
+                const alasanBoxHeight = 13;
+                doc.setDrawColor(190, 200, 215);
+                doc.rect(20, y, 170, alasanBoxHeight);
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                const alasanLines = doc.splitTextToSize(izin.alasan || '-', 160);
+                doc.text(alasanLines, 24, y + 7);
+
+                y += alasanBoxHeight + 10;
+
+                /* BUKTI FOTO */
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text('C. Bukti Foto', 20, y);
+                y += 8;
+
+                const imageData = await imageUrlToDataUrl(buktiUrl);
+                const imageProps = doc.getImageProperties(imageData);
+
+                const boxX = 20;
+                const boxWidth = 170;
+                const boxHeight = 50;
+
+                const maxHeight = 40;
+                let imageHeight = maxHeight;
+                let imageWidth = (imageProps.width * imageHeight) / imageProps.height;
+
+                if (imageWidth > boxWidth - 10) {
+                    imageWidth = boxWidth - 10;
+                    imageHeight = (imageProps.height * imageWidth) / imageProps.width;
+                }
+
+                doc.setDrawColor(190, 200, 215);
+                doc.rect(boxX, y, boxWidth, boxHeight);
+
+                const imageX = boxX + (boxWidth - imageWidth) / 2;
+                const imageY = y + (boxHeight - imageHeight) / 2;
+
+                doc.addImage(imageData, 'JPEG', imageX, imageY, imageWidth, imageHeight);
+
+                y += boxHeight + 15;
+
+                /* TANDA TANGAN */
+                if (y > 235) {
+                    doc.addPage();
+                    y = 30;
+                }
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+
+                doc.text('Surabaya, ' + formatTanggalSingkat(now), 145, y, { align: 'center' });
+                y += 7;
+                doc.text('Kepala Sekolah', 145, y, { align: 'center' });
+
+                y += 28;
+
+                doc.setFont('helvetica', 'bold');
+                doc.text('(Kepala Sekolah)', 145, y, { align: 'center' });
+
+                y += 6;
+
+
+                Swal.close();
+
+                const namaFile = `laporan-izin-${slugify(izin.nama_pengajar || 'guru')}.pdf`;
+                doc.save(namaFile);
+            } catch (error) {
+                console.error(error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Membuat PDF',
+                    text: 'Pastikan bukti gambar bisa diakses dari browser.',
+                    confirmButtonColor: '#19295C',
+                });
+            }
+        }
+
+        function imageUrlToDataUrl(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                };
+
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        function formatJenisIzin(jenis) {
+            if (jenis === 'sakit') return 'Sakit';
+            if (jenis === 'izin') return 'Izin';
+            if (jenis === 'dispensasi') return 'Dispensasi';
+            return jenis || '-';
+        }
+
+        function formatTanggal(tanggal) {
+            if (!tanggal) return '-';
+
+            return new Date(tanggal).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+            });
+        }
+        function formatBulanPdf(tanggal) {
+            if (!tanggal) return '-';
+
+            return new Date(tanggal).toLocaleDateString('id-ID', {
+                month: 'long',
+                year: 'numeric',
+            });
+        }
+
+        function formatTanggalSingkat(tanggal) {
+            if (!tanggal) return '-';
+
+            return new Date(tanggal).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
+}
+        function formatBuktiUrl(buktiUrl) {
+            if (!buktiUrl) return '';
+
+            if (buktiUrl.startsWith('http')) {
+                return buktiUrl;
+            }
+
+            return `https://hadirly-backend.vercel.app/uploads/${buktiUrl}`;
+        }
+
+        function slugify(text) {
+            return String(text)
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
+        }
+    </script>
+
+    <script src="navbar-sync.js"></script>
+</body>
+</html>
